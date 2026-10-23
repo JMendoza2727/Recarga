@@ -35,3 +35,9 @@ Funciona sin conexión tras la primera visita. Datos locales mediante localStora
 - Cotización 2026: https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/10721/10957/9932/4315/4316?changeLanguage=es
 
 La app ofrece una **estimación**, no una nómina oficial, informe fiscal o dictamen jurídico.
+
+
+## Botón «Ver convenio ACS»
+Se muestra en **Configuración inicial** y en **Calculadora**. Abre la página \`convenio-acsa.html\`, que detecta si existe el archivo **\`convenio-acsa-2025-2027.pdf\`** en la raíz del repositorio y lo muestra integrado. Si todavía no está subido, ofrece la ficha oficial en CIDO.
+
+Para alojar en GitHub la copia escaneada de las 34 fotografías del convenio, abre la carpeta de archivos del proyecto, utiliza **Add file → Upload files**, elige **\`convenio-acsa-2025-2027.pdf\`** y confirma **Commit changes**. Así cualquier compañero podrá abrir el PDF desde ambos botones. No subir nóminas u otros documentos personales.
