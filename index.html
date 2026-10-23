@@ -20,7 +20,7 @@ main{max-width:610px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0
 .header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:26px}
 .brand{display:flex;align-items:center;gap:11px}.logo{width:39px;height:39px;display:grid;place-items:center;background:#e6effb;color:var(--accent);border-radius:11px;font-weight:900;font-size:20px}
 .brandname{font-weight:780;letter-spacing:-.025em;font-size:19px}.subbrand{font-size:11px;color:var(--muted);margin-top:1px}
-.convenio-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #ceddee;border-radius:10px;background:#edf4fc;color:#285c92;font-size:13px;font-weight:700;text-decoration:none;padding:10px 13px;margin:-6px 0 19px;min-height:40px}
+.convenio-actions{display:flex;flex-wrap:wrap;gap:9px;margin:-6px 0 19px}.convenio-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #ceddee;border-radius:10px;background:#edf4fc;color:#285c92;font-size:13px;font-weight:700;text-decoration:none;padding:10px 13px;margin:0;min-height:40px}
 button.gear{background:white;border:1px solid var(--line);padding:10px 13px;border-radius:12px;font-size:18px;color:var(--ink)}
 h1{font-size:26px;line-height:1.16;letter-spacing:-.045em;margin:0 0 9px}h2{font-size:16px;letter-spacing:-.015em;margin:0 0 17px}h3{font-size:14px;margin:0}
 .lead{color:var(--muted);font-size:14px;line-height:1.5;margin:0 0 24px}
@@ -122,7 +122,7 @@ function configScreen(){
 const p=state.prices,settings=state.configured;
 return (settings?header(true):'<div class="header"><div class="brand"><div class="logo">R</div><div><div class="brandname">Recarga Control</div><div class="subbrand">Configuración inicial</div></div></div></div>')+
 '<h1>'+(settings?'Modificar precios':'Configura tus precios')+'</h1><p class="lead">Guarda tus tarifas una sola vez. Las podrás modificar en cualquier momento.</p>'+
-'<a class="convenio-link" href="./convenio-acsa.html" target="_blank" rel="noopener">▤ &nbsp;Ver convenio ACS</a>'+
+'<div class="convenio-actions"><a class="convenio-link" href="https://www.ccoo.cat/industria/conveni-de-la-industria-siderometallurgica-de-tarragona/" target="_blank" rel="noopener noreferrer">▤ &nbsp;Ver convenio TGN</a><a class="convenio-link" href="./convenio-acsa.html" target="_blank" rel="noopener">▤ &nbsp;Ver convenio ACSA</a></div>'+
 
 '<section class="panel"><div class="grid">'+field('Nombre (opcional)','name',p.name,'price',{full:true,text:true,placeholder:'Tu nombre'})+
 field('Hora normal (€/h)','normalRate',p.normalRate,'price',{required:true,placeholder:'Obligatorio'})+
@@ -145,7 +145,7 @@ function calculator(){
 const v=state.values,p=state.prices,c=cash();
 return header(false)+'<h1>'+(p.name?'Recarga de '+escapeHTML(p.name):'Calculadora de recarga')+'</h1>'+
 '<p class="lead">Introduce los totales de toda la recarga, aunque dure varios meses. No necesitas apuntar los datos día a día.</p>'+
-'<a class="convenio-link" href="./convenio-acsa.html" target="_blank" rel="noopener">▤ &nbsp;Ver convenio ACS</a>'+
+'<div class="convenio-actions"><a class="convenio-link" href="https://www.ccoo.cat/industria/conveni-de-la-industria-siderometallurgica-de-tarragona/" target="_blank" rel="noopener noreferrer">▤ &nbsp;Ver convenio TGN</a><a class="convenio-link" href="./convenio-acsa.html" target="_blank" rel="noopener">▤ &nbsp;Ver convenio ACSA</a></div>'+
 
 '<section class="panel"><h2>Horas y desplazamientos</h2><div class="grid">'+
 field('Horas normales','normal',v.normal,'val')+field('Horas extras','extra',v.extra,'val')+
