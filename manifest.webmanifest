@@ -1,0 +1,19 @@
+{
+  "name": "Recarga Control · Nómina",
+  "short_name": "Recarga",
+  "description": "Registro diario de horas, recarga y estimación de nómina.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#101925",
+  "theme_color": "#101925",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
