@@ -30,6 +30,10 @@ label.field{display:flex;flex-direction:column;gap:7px;font-size:12px;color:#455
 label.field input{appearance:none;border:1px solid #dce3ec;background:var(--field);padding:13px 12px;height:48px;border-radius:10px;width:100%;min-width:0;color:var(--ink);font-size:16px;font-weight:600}
 label.field input::placeholder{font-weight:400;color:#8b98a5}
 label.field input:disabled{background:#eef0f3}
+.readonly-field{display:flex;flex-direction:column;gap:7px;font-size:12px;color:#455567;font-weight:600}
+.readonly-rate{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #e0e6ee;background:#f2f5f9;border-radius:10px;min-height:48px;padding:12px;font-size:16px;font-weight:650;color:#344455}
+.readonly-rate span{font-size:13px;filter:grayscale(1);opacity:.55}
+
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 12px}.grid .full{grid-column:1/-1}
 .sep{height:1px;background:var(--line);margin:20px 0}.small{font-size:12px;color:var(--muted);line-height:1.55}.note{background:#f2f6fb;border:1px solid #e2eaf5;border-radius:11px;padding:13px;color:#415b78;font-size:12px;line-height:1.5;margin-top:16px}
 .primary{display:block;width:100%;border:0;background:var(--accent);color:white;font-weight:730;border-radius:12px;padding:14px 18px;min-height:49px;margin-top:18px}
@@ -76,14 +80,15 @@ button.ghost{border:1px solid var(--line);border-radius:11px;padding:13px;backgr
 (() => {
 "use strict";
 const KEY="recarga-control-simple-v3";
-const DEFAULT={name:"",normalRate:"",extraRate:"",dietRate:"19.50",kmRate:"0.47",premiumRate:"625.46",weekRate:"300",irpf:"23"};
+const LOCKED=Object.freeze({dietRate:"19.50",kmRate:"0.47",premiumRate:"625.46",weekRate:"300"});
+const DEFAULT={name:"",normalRate:"",extraRate:"",...LOCKED,irpf:"23"};
 const EMPTY={normal:"",extra:"",diets:"",km:"",comp:false,compHours:"",premium:false,week:false,other:false,otherAmount:""};
 let state={configured:false,prices:{...DEFAULT},values:{...EMPTY}},screen="start",modal="";
 try{
  const prior=JSON.parse(localStorage.getItem(KEY)||"null");
  if(prior&&typeof prior==="object"){
   state.configured=prior.configured===true;
-  state.prices={...DEFAULT,...(prior.prices||{})};
+  state.prices={...DEFAULT,...(prior.prices||{}),...LOCKED};
   state.values={...EMPTY,...(prior.values||{})};
  }
 }catch(e){}
@@ -93,7 +98,7 @@ const parse=v=>{let n=Number(String(v==null?"":v).trim().replace(",","."));retur
 const curr=n=>new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR"}).format(Math.round((n+Number.EPSILON)*100)/100);
 const fmt=n=>new Intl.NumberFormat("es-ES",{maximumFractionDigits:3}).format(n);
 const escapeHTML=v=>String(v??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function save(){state.prices={...state.prices,...LOCKED};try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
 function cash(){
  const p=state.prices,v=state.values;
  const hNormal=parse(v.normal),hExtra=parse(v.extra),requested=v.comp?parse(v.compHours):0;
@@ -121,22 +126,24 @@ function field(label,key,value,target,opts={}){
 function header(settings){
 return '<div class="header"><div class="brand"><div class="logo">R</div><div><div class="brandname">Recarga Control</div><div class="subbrand">Tu calculadora de recarga</div></div></div>'+ (settings?'<button class="editbtn" type="button" data-action="back" aria-label="Volver a la calculadora">← Volver</button>':'<button class="editbtn" type="button" data-action="settings" aria-label="Editar datos y precios">Editar datos</button>')+'</div>';
 }
+function fixedPrice(label,value){
+ return '<div class="field readonly-field"><span>'+label+'</span><div class="readonly-rate">'+value+' <span aria-label="No editable" title="Importe fijo">🔒</span></div></div>';
+}
 function configScreen(){
 const p=state.prices,settings=state.configured;
 return (settings?header(true):'<div class="header"><div class="brand"><div class="logo">R</div><div><div class="brandname">Recarga Control</div><div class="subbrand">Configuración inicial</div></div></div></div>')+
-'<h1>'+(settings?'Modificar precios':'Configura tus precios')+'</h1><p class="lead">Guarda tus tarifas una sola vez. Las podrás modificar en cualquier momento.</p>'+
+'<h1>'+(settings?'Modificar precios':'Configura tus precios')+'</h1><p class="lead">Indica el precio de tus horas. Las demás cantidades están fijadas en la aplicación.</p>'+
 '<div class="convenio-actions"><a class="convenio-link" href="https://www.ccoo.cat/industria/conveni-de-la-industria-siderometallurgica-de-tarragona/" target="_blank" rel="noopener noreferrer">▤ &nbsp;Ver convenio TGN</a><a class="convenio-link" href="./convenio-acsa.html" target="_blank" rel="noopener">▤ &nbsp;Ver convenio ACSA</a></div>'+
 
 '<section class="panel"><div class="grid">'+field('Nombre (opcional)','name',p.name,'price',{full:true,text:true,placeholder:'Tu nombre'})+
 field('Hora normal (€/h)','normalRate',p.normalRate,'price',{required:true,placeholder:'Obligatorio'})+
 field('Hora extra (€/h)','extraRate',p.extraRate,'price',{required:true,placeholder:'Obligatorio'})+
-'</div><div class="sep"></div><h2>Precios precargados, editables</h2><div class="grid">'+
-field('Media dieta (€)','dietRate',p.dietRate,'price')+
-field('Kilometraje (€/km)','kmRate',p.kmRate,'price')+
-field('Prima de recarga (€)','premiumRate',p.premiumRate,'price')+
-field('Compra de 5 días (€)','weekRate',p.weekRate,'price')+
+'</div><div class="sep"></div><h2>Importes fijos de referencia</h2><div class="grid">'+
+fixedPrice('Media dieta','19,50 €')+
+fixedPrice('Kilometraje','0,47 €/km')+
+fixedPrice('Prima de recarga','625,46 €')+
 field('IRPF (%) · editable','irpf',p.irpf,'price')+
-'</div><div class="note">Retén y salario habitual no se calculan como dinero extra. La prima corresponde a la referencia ACS 2026; los valores de media dieta y kilometraje son referencias anteriores pendientes de confirmar con las tablas provinciales definitivas de 2026.</div>'+
+'</div><div class="note">La media dieta y el kilometraje son referencias provinciales publicadas para 2025, no tarifas 2026 confirmadas. La prima corresponde a la referencia ACSA 2026. Los importes mostrados son fijos en esta versión.</div>'+
 '<div class="sep"></div><div class="small">Coeficientes: horas extras cobradas ×1,50 · descanso de horas compensadas ×1,75 · prima por compensar ×0,50.</div>'+
 '<button class="primary" type="button" data-action="prepare">Aceptar y continuar</button><div id="validation"></div></section>'+
 '<p class="foot">Tu información se guarda en este móvil, sin cuentas ni registro.</p>';
@@ -231,7 +238,7 @@ return "";
 app.addEventListener("input",ev=>{
 const el=ev.target;
 if(el.dataset.price){
- const key=el.dataset.price;state.prices[key]=el.value;
+ const key=el.dataset.price;if(Object.prototype.hasOwnProperty.call(LOCKED,key))return;state.prices[key]=el.value;
  if(key==="irpf"&&parse(el.value)>100)el.setCustomValidity("No puede superar el 100 %");else el.setCustomValidity("");
  save();
  if(screen==="calc") {
