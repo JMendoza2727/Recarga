@@ -1,5 +1,5 @@
-const CACHE = "recarga-pwa-v1";
-const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
+const CACHE = "recarga-pwa-v2";
+const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./icons/icon-192.png", "./icons/icon-512.png"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES)).then(() => self.skipWaiting()));
 });
