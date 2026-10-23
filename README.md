@@ -3,15 +3,15 @@
 Calculadora sencilla para **toda la recarga**, aunque ocupe octubre, noviembre y diciembre. Se instala en iPhone o Android sin necesidad de publicar en las tiendas.
 
 ## Cómo funciona
-1. **Primera vez:** nombre opcional, introduce tus precios de **hora normal** y **hora extra**. Los demás aparecen precargados pero son editables. Se muestra un aviso para verificar los precios antes de continuar.
+1. **Primera vez:** nombre opcional, introduce tus precios de **hora normal** y **hora extra**. La media dieta (19,50 €), el kilometraje (0,47 €/km) y la prima de recarga (625,46 €) aparecen como valores fijos no editables. El coste de compra de cinco días no aparece en Configuración (se descuenta automáticamente 300 € al activarlo). Se muestra un aviso para verificar los precios antes de continuar.
 2. **Calculadora única:** escribe el total de horas normales, horas extras, medias dietas y kilómetros de **toda la recarga**.
 3. Marca solo lo que corresponda: **compensar horas extraordinarias**, **prima de recarga**, **comprar cinco días de descanso** y **otros pluses**.
 4. La aplicación calcula el **valor total generado bruto**, el **dinero adicional bruto** sin duplicar horas normales ya abonadas y el **dinero adicional neto estimado** (IRPF siempre editable). También muestra los días libres acumulados.
 
 ### Tarifas precargadas
 - **Hora normal y hora extra:** vacías y obligatorias, cada persona introduce las suyas.
-- **Media dieta:** 19,50 € y **kilometraje:** 0,47 €/km. Son importes de las tablas provinciales **2025**, publicados por CCOO; faltaba publicación de tablas nuevas 2026 al crear esta versión.
-- **Prima de recarga ACS 2026:** 625,46 €; cambio de cinco días por 300 €.
+- **Media dieta (fija):** 19,50 € y **kilometraje (fijo):** 0,47 €/km. Son referencias de las tablas provinciales **2025**, no cuantías de 2026 verificadas.
+- **Prima de recarga ACSA 2026 (fija):** 625,46 €; descuento automático de cinco días por 300 €, sin tarifa editable.
 - **IRPF:** 23 %, editable tanto en configuración como en pantalla de resultados.
 - Horas extras cobradas ×1,5; descanso ×1,75; prima económica al compensar ×0,5.
 - **Seguridad Social estimada:** cotización adicional de horas extraordinarias ordinarias 4,70 %; otras primas y pluses sujetos, cálculo orientativo del 6,50 % basado en una nómina facilitada. El importe real puede variar según distribución mensual y bases.
