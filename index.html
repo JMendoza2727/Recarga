@@ -1,115 +1,277 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#101925"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Recarga">
-<meta name="description" content="Registro de horas y estimación de nómina de recarga.">
-<link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icons/icon-192.png" type="image/png"><link rel="apple-touch-icon" href="./icons/icon-192.png">
-<title>Recarga · Control de nómina</title>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fa">
+<meta name="description" content="Calcula cuánto dinero adicional y cuántos días libres generas durante la recarga.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Recarga">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<title>Recarga Control</title>
 <style>
-:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark;--bg:#101925;--surface:#172435;--line:#2a3a4d;--txt:#f1f6fc;--muted:#9aacbf;--blue:#60a5fa;--green:#6ee7b7}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt)}button,input,select{font:inherit}button{cursor:pointer}header{background:#142033;border-bottom:1px solid var(--line);padding:18px max(17px,calc((100vw - 760px)/2));display:flex;align-items:center;justify-content:space-between}header strong{font-size:20px;letter-spacing:.03em}header small{color:var(--muted)}main{max-width:760px;margin:auto;padding:18px 16px 70px}.pill{border-radius:100px;background:#203247;color:#c3d4ea;padding:6px 10px;font-size:11px}.month{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:18px 0}h1{font-size:25px;margin:0;text-transform:capitalize;letter-spacing:-.02em}h2{font-size:18px;margin:6px 0 16px}h3{font-size:15px;margin:0 0 10px}.sub{color:var(--muted);font-size:12px}.navbtn{border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--txt);padding:9px 15px;font-weight:800}.tabs{display:flex;gap:5px;background:#172334;border:1px solid var(--line);border-radius:13px;padding:5px;margin:0 0 16px}.tabs button{flex:1;background:none;color:var(--muted);border:0;border-radius:10px;padding:11px 4px;font-size:13px}.tabs button.active{background:#2b4665;color:#fff;font-weight:700}.card{border:1px solid var(--line);border-radius:17px;background:var(--surface);padding:17px;margin:12px 0}.hero{background:linear-gradient(135deg,#1e3b60,#172637);border:1px solid #345479}.hero .amount{font-size:39px;font-weight:800;letter-spacing:-.05em;margin:6px 0}.hero .amount span{font-size:20px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric{background:#192c3f;border-radius:11px;padding:14px}.metric b{display:block;font-size:19px;margin-top:5px}.metric span{font-size:11px;color:#acc0d4}.line{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}.line:last-child{border-bottom:0}.line strong{font-variant-numeric:tabular-nums}.hint{color:var(--muted);line-height:1.55;font-size:12px}label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:#bcd0e2}input,select{display:block;width:100%;padding:11px 10px;background:#111d2c;border:1px solid #36516a;border-radius:9px;color:#fff;min-width:0}input:focus,select:focus{outline:2px solid #407fbf}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 10px}.wide{grid-column:span 2}.switch{display:flex;flex-direction:row;align-items:center;gap:10px;font-size:14px}.switch input{width:18px;height:18px;accent-color:#57a7ee}.btn{background:#356da7;border:1px solid #467db5;border-radius:10px;padding:11px 15px;color:#fff;font-weight:700}.btn.ghost{background:#1b2e43;border-color:#344c64}.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.dayrow{border-top:1px solid var(--line);padding:13px 0}.dayhead{display:flex;justify-content:space-between;gap:9px;align-items:center;margin:0 0 10px;font-weight:700}.dayhead .sun{color:#f4c87f}.daygrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.daygrid label{font-size:11px}.daygrid input{padding:9px 7px;text-align:center}.totals{position:sticky;bottom:0;border:1px solid #335b80;background:#1a3752;box-shadow:0 -8px 24px #101925c9;border-radius:13px;padding:12px 15px;display:flex;justify-content:space-between;align-items:center;z-index:3}.totals b{font-size:22px}footer{text-align:center;color:var(--muted);font-size:11px;line-height:1.5;padding:20px 0}@media(min-width:600px){.daygrid{grid-template-columns:repeat(6,minmax(0,1fr))}.grid{grid-template-columns:repeat(4,1fr)}}@media(max-width:380px){.daygrid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero .amount{font-size:32px}}
-</style></head><body>
-<header><strong>▤ RECARGA</strong><small>Control de nómina <span class="pill">Privado · Offline</span></small></header>
-<main><div class="month"><button class="navbtn" id="prev" aria-label="Mes anterior">‹</button><div style="text-align:center"><div class="sub">PERIODO</div><h1 id="month"></h1></div><button class="navbtn" id="next" aria-label="Mes siguiente">›</button></div>
-<div class="tabs"><button data-tab="resumen" class="active">Resumen</button><button data-tab="registro">Registro</button><button data-tab="ajustes">Tarifas y ajustes</button></div><div id="view"></div>
-<footer>Estimación orientativa. Los importes pueden diferir de la nómina oficial. Los datos se guardan únicamente en este dispositivo.</footer></main>
+:root{color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:16px;--bg:#f7f8fa;--panel:#fff;--ink:#1b2633;--muted:#667483;--line:#e5eaf0;--field:#f4f6f8;--accent:#2f69aa;--green:#176746}
+*{box-sizing:border-box}html{min-height:100%}body{margin:0;background:var(--bg);color:var(--ink);line-height:1.4;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit}button{cursor:pointer;touch-action:manipulation}button:focus-visible,input:focus-visible{outline:3px solid #94bdf1;outline-offset:2px}
+main{max-width:610px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0px)) 18px calc(48px + env(safe-area-inset-bottom,0px))}
+.header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:26px}
+.brand{display:flex;align-items:center;gap:11px}.logo{width:39px;height:39px;display:grid;place-items:center;background:#e6effb;color:var(--accent);border-radius:11px;font-weight:900;font-size:20px}
+.brandname{font-weight:780;letter-spacing:-.025em;font-size:19px}.subbrand{font-size:11px;color:var(--muted);margin-top:1px}
+button.gear{background:white;border:1px solid var(--line);padding:10px 13px;border-radius:12px;font-size:18px;color:var(--ink)}
+h1{font-size:26px;line-height:1.16;letter-spacing:-.045em;margin:0 0 9px}h2{font-size:16px;letter-spacing:-.015em;margin:0 0 17px}h3{font-size:14px;margin:0}
+.lead{color:var(--muted);font-size:14px;line-height:1.5;margin:0 0 24px}
+.panel{border:1px solid var(--line);background:var(--panel);padding:20px;border-radius:17px;margin:14px 0}
+label.field{display:flex;flex-direction:column;gap:7px;font-size:12px;color:#455567;font-weight:600}
+label.field input{appearance:none;border:1px solid #dce3ec;background:var(--field);padding:13px 12px;height:48px;border-radius:10px;width:100%;min-width:0;color:var(--ink);font-size:16px;font-weight:600}
+label.field input::placeholder{font-weight:400;color:#8b98a5}
+label.field input:disabled{background:#eef0f3}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 12px}.grid .full{grid-column:1/-1}
+.sep{height:1px;background:var(--line);margin:20px 0}.small{font-size:12px;color:var(--muted);line-height:1.55}.note{background:#f2f6fb;border:1px solid #e2eaf5;border-radius:11px;padding:13px;color:#415b78;font-size:12px;line-height:1.5;margin-top:16px}
+.primary{display:block;width:100%;border:0;background:var(--accent);color:white;font-weight:730;border-radius:12px;padding:14px 18px;min-height:49px;margin-top:18px}
+.secondary{border:1px solid #cad6e3;background:white;color:var(--accent);padding:11px 14px;border-radius:10px;font-weight:670}
+.danger{color:#a23d35}
+.error{background:#fff1ef;color:#b13e35;padding:10px;border:1px solid #f1cdc8;border-radius:10px;font-size:12px;line-height:1.5;margin-top:12px}
+.checkline{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-bottom:1px solid var(--line);cursor:pointer;font-size:14px;font-weight:570}
+.checkline:last-of-type{border-bottom:0}
+.checkline input{appearance:none;width:22px;height:22px;flex:0 0 22px;border:1.8px solid #aab8c9;border-radius:6px;background:#fff;position:relative;margin:0;cursor:pointer}
+.checkline input:checked{background:var(--accent);border-color:var(--accent)}
+.checkline input:checked:after{content:"✓";position:absolute;left:4px;top:-3px;color:#fff;font-size:19px;font-weight:800}
+.checkline .checktext{flex:1}
+.reveal{background:#f6f8fb;border-radius:12px;padding:14px;margin:3px 0 10px}
+.reveal .grid{gap:12px}.statusline{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted);margin-top:12px}.statusline b{color:var(--ink);font-size:13px}
+.totals{padding:19px;margin-top:18px}
+.totalrow{padding:12px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line)}
+.totalrow:last-child{border:0}.totalrow strong{font-size:19px;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.035em}
+.totalrow span{font-size:13px;color:#516274;line-height:1.35}
+.totalrow.large{padding:18px 0}.totalrow.large strong{font-size:26px;color:var(--green)}
+.explain{background:#f3f6fa;border-radius:10px;padding:12px 13px;color:#586776;font-size:12px;line-height:1.5;margin-top:13px}
+.irpf{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.irpf label{font-size:13px;font-weight:650}.irpf input{width:89px;text-align:right;border:1px solid #cfdbe7;background:var(--field);border-radius:9px;font-size:16px;font-weight:700;padding:10px 12px}
+.inlinerow{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin:11px 0;font-size:13px}.inlinerow .value{white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:700}
+details{border:1px solid var(--line);border-radius:12px;background:white;margin-top:13px;overflow:hidden}
+summary{padding:15px 17px;cursor:pointer;font-size:13px;font-weight:700}
+.detailbody{padding:0 17px 15px}
+.detailrow{display:flex;justify-content:space-between;gap:12px;margin:11px 0;font-size:12px}
+.detailrow span:first-child{color:var(--muted)}
+.detailrow span:last-child{font-weight:650;white-space:nowrap;font-variant-numeric:tabular-nums}
+.foot{font-size:11px;color:#84919e;line-height:1.6;text-align:center;margin:22px 4px 0}
+.modalback{position:fixed;inset:0;background:#13233b91;display:grid;place-items:center;padding:18px;z-index:9}
+.modal{max-width:420px;width:100%;background:white;border-radius:19px;padding:25px;box-shadow:0 20px 70px #14223d45}
+.modal h2{font-size:21px}.modal p{color:var(--muted);font-size:14px;line-height:1.5}
+.modal .actions{display:flex;gap:10px}.modal .actions button{flex:1}
+button.ghost{border:1px solid var(--line);border-radius:11px;padding:13px;background:#fff;color:var(--ink);font-weight:680}
+@media(max-width:350px){main{padding-left:12px;padding-right:12px}.panel{padding:15px}.totalrow strong{font-size:17px}.totalrow.large strong{font-size:23px}}
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"></main>
 <script>
-(function(){
+(() => {
 "use strict";
-var KEY="recarga-control-2026-v1", S={
-name:"",mode:"daily",normalRate:18.05,extraRate:18.05,dailyBase:62.14,dailyPTP:9.58,dailyNuclear:6.61,dailyTurn:3.53,showPTP:true,showNuclear:true,showTurn:true,fixedPay:2455.8,
-extraFactor:1.5,restFactor:1.75,restCashFactor:.5,hoursPerDay:8,
-kmRate:0,dietRate:0,dayPlusRate:0,holidayPlusRate:0,
-onCallNormalRate:28.60,onCallHolidayRate:71.51,premiumRate:625.46,weekCost:300,
-irpf:23.17,socialRate:6.5,extraContribution:385.63,collectiveContribution:3.87,
-healthFlexible:41.67,healthInKind:22.17
-};
-var d;try{d=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){d={}}if(!d||typeof d!=="object")d={};
-d.settings=Object.assign({},S,d.settings||{});d.months=d.months||{};
-var today=new Date(), month=d.currentMonth||[today.getFullYear(),String(today.getMonth()+1).padStart(2,"0")].join("-"),tab="resumen";
-function num(v){var n=Number(String(v===undefined||v===null?"":v).replace(",","."));return isFinite(n)?n:0}
-function non(v){return Math.max(0,num(v))}
-function r(v){return Math.round((v+Number.EPSILON)*100)/100}
-function money(v){return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR"}).format(v)}
-function save(){d.currentMonth=month;localStorage.setItem(KEY,JSON.stringify(d))}
-function md(){if(!d.months[month])d.months[month]={days:{},compDays:0,onCall:false,onNormal:0,onHoliday:0,premium:false,buyWeek:false,otherGross:0,otherDed:0};return d.months[month]}
-function monthDays(){var parts=month.split("-").map(Number);return new Date(parts[0],parts[1],0).getDate()}
-function calc(){
- var s=d.settings,m=md(),days=Object.values(m.days||{}),sum=function(k){return days.reduce(function(a,b){return a+non(b[k])},0)};
- var normal=sum("normal"),extra=sum("extra"),km=sum("km"),diets=sum("diet"),pd=sum("pd"),pf=sum("pf");
- var req=non(m.compDays),compH=Math.min(extra,req*non(s.hoursPerDay)/Math.max(.01,non(s.restFactor))),compDays=compH*non(s.restFactor)/Math.max(.01,non(s.hoursPerDay));
- var paidH=Math.max(0,extra-compH),cashExtra=r(paidH*non(s.extraRate)*non(s.extraFactor)),restCash=r(compH*non(s.extraRate)*non(s.restCashFactor));
- var base=s.mode==="hourly"?r((normal+compDays*non(s.hoursPerDay))*non(s.normalRate)):
- s.mode==="fixed"?r(non(s.fixedPay)):
- r(monthDays()*(non(s.dailyBase)+(s.showPTP?non(s.dailyPTP):0)+(s.showNuclear?non(s.dailyNuclear):0)+(s.showTurn?non(s.dailyTurn):0)));
- var onCall=m.onCall?r(non(m.onNormal)*non(s.onCallNormalRate)+non(m.onHoliday)*non(s.onCallHolidayRate)):0;
- var supplements=r(km*non(s.kmRate)+diets*non(s.dietRate)+pd*non(s.dayPlusRate)+pf*non(s.holidayPlusRate));
- var premium=m.premium?r(Math.max(0,non(s.premiumRate)-(m.buyWeek?non(s.weekCost):0))):0;
- var gross=r(base+cashExtra+restCash+onCall+supplements+premium+num(m.otherGross));
- var ssBase=non(gross+non(s.extraContribution)+non(s.collectiveContribution));
- var ss=r(r(ssBase*.0485)+r(ssBase*.0155)+r(ssBase*.001));if(non(s.socialRate)!==6.5)ss=r(ssBase*non(s.socialRate)/100);
- var flexible=m.health?non(s.healthFlexible):0,inkind=m.health?non(s.healthInKind):0;
- var taxable=Math.max(0,gross-flexible-inkind),irpf=r(taxable*non(s.irpf)/100),inkindIRPF=r(inkind*non(s.irpf)/100);
- var deductions=r(ss+irpf+inkindIRPF+flexible+inkind+num(m.otherDed)),net=r(gross-deductions);
- return {normal:normal,extra:extra,compH:compH,compDays:compDays,possibleDays:extra*non(s.restFactor)/Math.max(.01,non(s.hoursPerDay)),paidH:paidH,cashExtra:cashExtra,restCash:restCash,base:base,onCall:onCall,supplements:supplements,premium:premium,gross:gross,ss:ss,irpf:irpf,flexible:flexible,inkind:inkind,inkindIRPF:inkindIRPF,deductions:deductions,net:net,km:km,diets:diets};
+const KEY="recarga-control-simple-v3";
+const DEFAULT={name:"",normalRate:"",extraRate:"",dietRate:"19.50",kmRate:"0.47",premiumRate:"625.46",weekRate:"300",irpf:"23"};
+const EMPTY={normal:"",extra:"",diets:"",km:"",comp:false,compHours:"",premium:false,week:false,other:false,otherAmount:""};
+let state={configured:false,prices:{...DEFAULT},values:{...EMPTY}},screen="start",modal="";
+try{
+ const prior=JSON.parse(localStorage.getItem(KEY)||"null");
+ if(prior&&typeof prior==="object"){
+  state.configured=prior.configured===true;
+  state.prices={...DEFAULT,...(prior.prices||{})};
+  state.values={...EMPTY,...(prior.values||{})};
+ }
+}catch(e){}
+if(state.configured) screen="calc";
+const app=document.getElementById("app");
+const parse=v=>{let n=Number(String(v==null?"":v).trim().replace(",","."));return Number.isFinite(n)?Math.max(0,Math.min(n,1e9)):0};
+const curr=n=>new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR"}).format(Math.round((n+Number.EPSILON)*100)/100);
+const fmt=n=>new Intl.NumberFormat("es-ES",{maximumFractionDigits:3}).format(n);
+const escapeHTML=v=>String(v??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function cash(){
+ const p=state.prices,v=state.values;
+ const hNormal=parse(v.normal),hExtra=parse(v.extra),requested=v.comp?parse(v.compHours):0;
+ const valid=requested<=hExtra,restH=Math.min(requested,hExtra),paidH=hExtra-restH;
+ const hourlyNormal=hNormal*parse(p.normalRate);
+ const paidExtra=paidH*parse(p.extraRate)*1.5;
+ const compPremium=restH*parse(p.extraRate)*.5;
+ const travel=parse(v.diets)*parse(p.dietRate)+parse(v.km)*parse(p.kmRate);
+ const paidPrime=v.premium?Math.max(0,parse(p.premiumRate)-(v.week?parse(p.weekRate):0)):0;
+ const other=v.other?parse(v.otherAmount):0;
+ const extraGross=paidExtra+compPremium+travel+paidPrime+other;
+ const totalGross=hourlyNormal+extraGross;
+ const taxable=paidExtra+compPremium+paidPrime+other;
+ const irpf=taxable*parse(p.irpf)/100;
+ const ssExtra=paidExtra*.047;
+ const ssCommon=(compPremium+paidPrime+other)*.065;
+ const ss=ssExtra+ssCommon;
+ const extraNet=extraGross-irpf-ss;
+ return {hNormal,hExtra,requested,valid,restH,paidH,hourlyNormal,paidExtra,compPremium,travel,paidPrime,other,extraGross,totalGross,taxable,irpf,ssExtra,ssCommon,ss,extraNet,days:restH*1.75/8+(v.week&&v.premium?5:0),compDays:restH*1.75/8};
 }
-function line(label,val){return '<div class="line"><span>'+label+'</span><strong>'+money(val)+'</strong></div>'}
-function esc(v){return String(v===undefined||v===null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
-function input(label,key,obj,value,step){return '<label>'+label+'<input type="number" inputmode="decimal" step="'+(step||"any")+'" min="0" data-target="'+obj+'" data-key="'+key+'" value="'+esc(value)+'"></label>'}
-function check(label,key,obj,on){return '<label class="switch"><input type="checkbox" data-target="'+obj+'" data-key="'+key+'" '+(on?"checked":"")+'>'+label+'</label>'}
-function sel(label,key,choices,current){return '<label>'+label+'<select data-target="s" data-key="'+key+'">'+choices.map(function(o){return '<option value="'+o[0]+'" '+(o[0]===current?"selected":"")+'>'+o[1]+'</option>'}).join("")+'</select></label>'}
-function mainSummary(){
-var a=calc(),m=md();
-return '<section class="card hero"><div class="sub">NETO ESTIMADO DEL MES</div><div class="amount">'+money(a.net)+'</div><div class="sub">Según tus tarifas y registros; importe orientativo</div></section>'+
-'<section class="grid"><div class="metric"><span>Bruto estimado</span><b>'+money(a.gross)+'</b></div><div class="metric"><span>Horas normales</span><b>'+a.normal+' h</b></div><div class="metric"><span>Horas extras</span><b>'+a.extra+' h</b></div><div class="metric"><span>Descanso generado</span><b>'+a.compDays.toFixed(2)+' días</b></div></section>'+
-'<section class="card"><h2>Detalle del cálculo</h2>'+line("Salario ordinario",a.base)+line("Horas extras cobradas ("+r(a.paidH)+" h)",a.cashExtra)+line("Prima horas compensadas",a.restCash)+line("Retén",a.onCall)+line("Dietas, kilómetros y pluses",a.supplements)+line("Prima de recarga (neta de compra)",a.premium)+line("Otros devengos",num(m.otherGross))+
-'<div class="line"><b>TOTAL BRUTO</b><strong>'+money(a.gross)+'</strong></div>'+line("Seguridad Social (estimada)",-a.ss)+line("IRPF ("+non(d.settings.irpf)+" %)",-a.irpf)+line("Seguro flexible",-a.flexible)+line("Seguro en especie",-a.inkind)+line("Ingreso a cuenta en especie",-a.inkindIRPF)+line("Otras deducciones",-num(m.otherDed))+'<div class="line"><b>NETO APROXIMADO</b><strong style="color:var(--green)">'+money(a.net)+'</strong></div></section>'+
-'<section class="card"><h2>Horas y descansos</h2><div class="grid"><div class="metric"><span>Extras cobradas</span><b>'+r(a.paidH)+' h</b></div><div class="metric"><span>Extras compensadas</span><b>'+r(a.compH)+' h</b></div><div class="metric"><span>Días ganados por horas</span><b>'+a.compDays.toFixed(2)+'</b></div><div class="metric"><span>Semana comprada</span><b>'+(m.buyWeek&&m.premium?'5 días':'No')+'</b></div></div>'+(non(m.compDays)>a.possibleDays+.001?'<p class="hint" style="color:#fbbf8b">Has solicitado más días compensados de los generados por las horas registradas.</p>':'')+
-'<p class="hint">Si las horas extras se liquidan en otro mes, regístralas en el mes en que te las paguen para aproximar la nómina.</p></section>';
+function field(label,key,value,target,opts={}){
+ const type=opts.text?"text":"number",placeholder=opts.placeholder||"0",step=type==="number"?'step="any" min="0" inputmode="decimal"':"",required=opts.required?' aria-required="true"':"";
+ return '<label class="field '+(opts.full?"full":"")+'"><span>'+label+'</span><input type="'+type+'" '+step+required+' data-'+target+'="'+key+'" value="'+escapeHTML(value)+'" placeholder="'+escapeHTML(placeholder)+'" autocomplete="off"></label>';
 }
-function records(){
- var m=md(),parts=month.split("-").map(Number),n=monthDays(),out='<section class="card"><h2>Registro diario</h2><p class="hint">Indica las horas y conceptos realmente realizados. Deja los campos vacíos cuando no correspondan. Los datos se guardan automáticamente.</p>';
- var fields=[["normal","H. normales"],["extra","H. extras"],["km","Km"],["diet","½ dietas"],["pd","Plus diario"],["pf","Plus festivo"]];
- for(var i=1;i<=n;i++){var x=m.days[i]||{},w=new Date(parts[0],parts[1]-1,i).getDay();out+='<div class="dayrow"><div class="dayhead"><span>'+i+' · '+["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"][w]+'</span>'+(w===0||w===6?'<span class="sun">Fin de semana</span>':'')+'</div><div class="daygrid">';
- for(var j=0;j<fields.length;j++){var f=fields[j];out+='<label>'+f[1]+'<input type="number" min="0" step="any" inputmode="decimal" data-day="'+i+'" data-key="'+f[0]+'" placeholder="—" value="'+esc(x[f[0]]===undefined?"":x[f[0]])+'"></label>'}out+='</div></div>';}
- return out+'</section><section class="totals"><span>Bruto del mes</span><b id="stickyGross">'+money(calc().gross)+'</b></section>';
+function header(settings){
+return '<div class="header"><div class="brand"><div class="logo">R</div><div><div class="brandname">Recarga Control</div><div class="subbrand">Tu calculadora de recarga</div></div></div>'+ (settings?'<button class="gear" type="button" data-action="back" aria-label="Volver a la calculadora">←</button>':'<button class="gear" type="button" data-action="settings" aria-label="Cambiar precios">⚙</button>')+'</div>';
 }
-function settings(){
-var s=d.settings,m=md(),out='<section class="card"><h2>Configuración personal</h2><div class="formgrid">'+sel("Modelo de salario","mode",[["daily","Salario + pluses diarios"],["hourly","Horas normales × tarifa"],["fixed","Sueldo mensual fijo"]],s.mode)+input("€/hora normal","normalRate","s",s.normalRate)+input("€/hora extra","extraRate","s",s.extraRate)+input("Salario convenio €/día","dailyBase","s",s.dailyBase)+input("P.T.P. €/día","dailyPTP","s",s.dailyPTP)+input("Nuclear €/día","dailyNuclear","s",s.dailyNuclear)+input("Turnos €/día","dailyTurn","s",s.dailyTurn)+input("Sueldo fijo €/mes","fixedPay","s",s.fixedPay)+check("Incluir P.T.P.","showPTP","s",s.showPTP)+check("Incluir plus nuclear","showNuclear","s",s.showNuclear)+check("Incluir turnos","showTurn","s",s.showTurn)+'</div></section>';
-out+='<section class="card"><h2>Horas extras y compensación</h2><div class="formgrid">'+input("Multiplicador de extras cobradas","extraFactor","s",s.extraFactor)+input("Multiplicador de descanso","restFactor","s",s.restFactor)+input("Prima de horas compensadas","restCashFactor","s",s.restCashFactor)+input("Horas de jornada ordinaria","hoursPerDay","s",s.hoursPerDay)+input("Días compensados este mes","compDays","m",m.compDays)+'</div><p class="hint">Ejemplo: 11 horas extras compensadas producen 2,40625 días de descanso y una prima de 5,5 horas a la tarifa extra. Indica arriba cuántos días has decidido compensar.</p></section>';
-out+='<section class="card"><h2>Retén y prima de recarga</h2><div class="formgrid">'+check("He tenido retén","onCall","m",m.onCall)+input("Días retén semanal","onNormal","m",m.onNormal)+input("Días retén festivo","onHoliday","m",m.onHoliday)+input("€/día retén normal","onCallNormalRate","s",s.onCallNormalRate)+input("€/día retén festivo","onCallHolidayRate","s",s.onCallHolidayRate)+check("Cobro prima de recarga este mes","premium","m",m.premium)+input("Prima recarga bruta (€)","premiumRate","s",s.premiumRate)+check("Cambio 300 € por 5 días de descanso","buyWeek","m",m.buyWeek)+input("Coste de la semana (€)","weekCost","s",s.weekCost)+'</div></section>';
-out+='<section class="card"><h2>Dietas, kilómetros y otros pluses</h2><div class="formgrid">'+input("€/km","kmRate","s",s.kmRate)+input("€/media dieta","dietRate","s",s.dietRate)+input("€/unidad plus diario","dayPlusRate","s",s.dayPlusRate)+input("€/unidad plus festivo","holidayPlusRate","s",s.holidayPlusRate)+input("Otros devengos (€)","otherGross","m",m.otherGross)+input("Otras deducciones (€)","otherDed","m",m.otherDed)+'</div></section>';
-out+='<section class="card"><h2>IRPF, cotización y seguro</h2><div class="formgrid">'+input("IRPF (%)","irpf","s",s.irpf)+input("Seguridad Social aproximada (%)","socialRate","s",s.socialRate)+input("Prorrata extras para cotización (€)","extraContribution","s",s.extraContribution)+input("Otros ajustes cotización (€)","collectiveContribution","s",s.collectiveContribution)+check("Tengo seguro médico","health","m",m.health)+input("Seguro flexible (€)","healthFlexible","s",s.healthFlexible)+input("Seguro en especie (€)","healthInKind","s",s.healthInKind)+'</div><p class="hint">Seguro de referencia de nómina: 41,67 € de retribución flexible y 22,17 € en especie, más ingreso a cuenta. El cálculo de Seguridad Social e IRPF es aproximado y depende de los conceptos reales de cada nómina.</p></section>';
-out+='<section class="card"><h2>Copia de seguridad</h2><p class="hint">Los datos se almacenan solo en este navegador. Exporta un archivo antes de cambiar de móvil o borrar los datos de Safari/Chrome.</p><div class="tools"><button class="btn" id="export">Exportar datos JSON</button><label class="btn ghost" style="display:inline-block;cursor:pointer">Importar copia<input style="display:none" type="file" id="import" accept="application/json,.json"></label><button class="btn ghost" id="clear">Borrar únicamente este mes</button></div></section>';
-return out;
+function configScreen(){
+const p=state.prices,settings=state.configured;
+return (settings?header(true):'<div class="header"><div class="brand"><div class="logo">R</div><div><div class="brandname">Recarga Control</div><div class="subbrand">Configuración inicial</div></div></div></div>')+
+'<h1>'+(settings?'Modificar precios':'Configura tus precios')+'</h1><p class="lead">Guarda tus tarifas una sola vez. Las podrás modificar en cualquier momento.</p>'+
+'<section class="panel"><div class="grid">'+field('Nombre (opcional)','name',p.name,'price',{full:true,text:true,placeholder:'Tu nombre'})+
+field('Hora normal (€/h)','normalRate',p.normalRate,'price',{required:true,placeholder:'Obligatorio'})+
+field('Hora extra (€/h)','extraRate',p.extraRate,'price',{required:true,placeholder:'Obligatorio'})+
+'</div><div class="sep"></div><h2>Precios precargados, editables</h2><div class="grid">'+
+field('Media dieta (€)','dietRate',p.dietRate,'price')+
+field('Kilometraje (€/km)','kmRate',p.kmRate,'price')+
+field('Prima de recarga (€)','premiumRate',p.premiumRate,'price')+
+field('Compra de 5 días (€)','weekRate',p.weekRate,'price')+
+'</div><div class="note">Retén y salario habitual no se calculan como dinero extra. La prima corresponde a la referencia ACS 2026; los valores de media dieta y kilometraje son referencias anteriores pendientes de confirmar con las tablas provinciales definitivas de 2026.</div>'+
+'<div class="sep"></div><div class="small">Coeficientes: horas extras cobradas ×1,50 · descanso de horas compensadas ×1,75 · prima por compensar ×0,50.</div>'+
+'<button class="primary" type="button" data-action="prepare">Aceptar y continuar</button><div id="validation"></div></section>'+
+'<p class="foot">Tu información se guarda en este móvil, sin cuentas ni registro.</p>';
 }
-function show(){
-var parts=month.split("-").map(Number),date=new Date(parts[0],parts[1]-1,1);
-document.getElementById("month").textContent=new Intl.DateTimeFormat("es-ES",{month:"long",year:"numeric"}).format(date);
-document.querySelectorAll("[data-tab]").forEach(function(b){b.classList.toggle("active",b.dataset.tab===tab)});
-document.getElementById("view").innerHTML=tab==="resumen"?mainSummary():tab==="registro"?records():settings();
+function check(label,key,checked){
+return '<label class="checkline"><span class="checktext">'+label+'</span><input type="checkbox" data-flag="'+key+'" '+(checked?'checked':'')+'></label>';
 }
-function changeValue(target,key,value,day){
- if(target==="s")d.settings[key]=value;
- if(target==="m")md()[key]=value;
- if(day!==undefined){var a=md().days;if(!a[day])a[day]={};a[day][key]=value;}
+function calculator(){
+const v=state.values,p=state.prices,c=cash();
+return header(false)+'<h1>'+(p.name?'Recarga de '+escapeHTML(p.name):'Calculadora de recarga')+'</h1>'+
+'<p class="lead">Introduce los totales de toda la recarga, aunque dure varios meses. No necesitas apuntar los datos día a día.</p>'+
+'<section class="panel"><h2>Horas y desplazamientos</h2><div class="grid">'+
+field('Horas normales','normal',v.normal,'val')+field('Horas extras','extra',v.extra,'val')+
+field('Medias dietas','diets',v.diets,'val')+field('Kilómetros','km',v.km,'val')+
+'</div></section>'+
+'<section class="panel"><h2>Complementos y descansos</h2>'+
+check('He compensado horas extras','comp',v.comp)+
+(v.comp?'<div class="reveal">'+field('Horas extras que compensas','compHours',v.compHours,'val',{placeholder:'Ej. 11'})+
+'<div class="statusline"><span>Descanso conseguido</span><b id="compDays">'+fmt(c.compDays)+' días</b></div>'+
+'<div class="statusline"><span>Prima por compensación</span><b id="compCash">'+curr(c.compPremium)+'</b></div>'+
+'<div id="hoursWarn">'+(!c.valid?'<div class="error">Has compensado más horas de las extras indicadas. El cálculo usa únicamente las horas disponibles.</div>':'')+'</div></div>':'')+
+check('Cobro la prima de recarga','premium',v.premium)+
+check('He comprado 5 días de descanso','week',v.week)+
+(v.week?'<div class="reveal"><div class="statusline"><span>Días libres adicionales</span><b>5 días</b></div><div class="statusline"><span>Descuento de la prima</span><b>−'+curr(parse(p.weekRate))+'</b></div>'+(v.premium?'':'<div class="error">Para comprar los cinco días debe estar activada la prima de recarga.</div>')+'</div>':'')+
+check('Tengo algún plus adicional','other',v.other)+
+(v.other?'<div class="reveal">'+field('Importe bruto adicional (€)','otherAmount',v.otherAmount,'val')+'</div>':'')+
+'</section>'+
+'<section class="panel totals" id="results"></section>'+
+'<details id="detail"><summary>Ver desglose completo</summary><div class="detailbody" id="details"></div></details>'+
+'<p class="foot">Estimación orientativa de la recarga, no una nómina oficial. No incluye retén ni seguro médico. Se guarda automáticamente.</p>';
+}
+function detailed(c){
+return [
+['Horas normales (solo valor total)',c.hourlyNormal],
+['Horas extras cobradas (×1,5)',c.paidExtra],
+['Prima de horas compensadas (×0,5)',c.compPremium],
+['Dietas y kilometraje',c.travel],
+['Prima recarga, descontada compra',c.paidPrime],
+['Otros complementos',c.other],
+['Valor total generado',c.totalGross],
+['Dinero extra bruto',c.extraGross],
+['IRPF estimado sobre lo sujeto a retención',-c.irpf],
+['Cotización adicional extras (4,70 %)',-c.ssExtra],
+['Cotización ordinaria de otros pluses (6,50 %)',-c.ssCommon],
+['Dinero extra neto estimado',c.extraNet]
+].map(([n,v])=>'<div class="detailrow"><span>'+n+'</span><span>'+curr(v)+'</span></div>').join('')+
+'<div class="note">Las horas normales se muestran únicamente en el valor total: ya se abonan en las nóminas habituales. Las dietas y el kilometraje se consideran exentos en esta simulación si cumplen los requisitos legales; de otro modo el neto real será menor. La cotización exacta también depende de la distribución entre nóminas y sus bases.</div>';
+}
+function resultHTML(c){
+return '<h2>Resultado de la recarga</h2>'+
+'<div class="totalrow"><span>Valor total generado (bruto)</span><strong>'+curr(c.totalGross)+'</strong></div>'+
+'<div class="totalrow"><span>Dinero extra generado (bruto)</span><strong>'+curr(c.extraGross)+'</strong></div>'+
+'<div class="explain">Las horas normales no se incluyen en el dinero extra porque ya se cobran en las nóminas habituales. Sumarlas otra vez duplicaría ese ingreso.</div>'+
+'<div class="irpf"><label for="editable-irpf">IRPF (%) · editable siempre</label><input id="editable-irpf" type="number" inputmode="decimal" step="any" min="0" max="100" data-price="irpf" value="'+escapeHTML(state.prices.irpf)+'"></div>'+
+'<div class="inlinerow"><span>IRPF estimado</span><span class="value">−'+curr(c.irpf)+'</span></div>'+
+'<div class="inlinerow"><span>Seguridad Social estimada</span><span class="value">−'+curr(c.ss)+'</span></div>'+
+'<div class="totalrow large"><span><b>Dinero extra neto estimado</b></span><strong>'+curr(c.extraNet)+'</strong></div>'+
+'<div class="totalrow"><span>Días libres conseguidos</span><strong>'+fmt(c.days)+' días</strong></div>'+
+'<p class="small">Se aplica un 4,70 % a las horas extras cobradas y una estimación del 6,50 % a las primas y otros pluses sujetos a cotización. Dietas y km se consideran exentos solo si cumplen los requisitos legales.</p>';
+}
+function refresh(){
+if(screen!=="calc")return;
+const c=cash(),r=document.getElementById("results"),detail=document.getElementById("details");
+if(!r)return;
+const irpf=document.getElementById("editable-irpf");
+const focused=document.activeElement===irpf;
+const cursor=focused?irpf.selectionStart:null;
+r.innerHTML=resultHTML(c);
+if(detail)detail.innerHTML=detailed(c);
+let cd=document.getElementById("compDays");if(cd)cd.textContent=fmt(c.compDays)+" días";
+let cp=document.getElementById("compCash");if(cp)cp.textContent=curr(c.compPremium);
+let warn=document.getElementById("hoursWarn");if(warn)warn.innerHTML=c.valid?'':'<div class="error">Has compensado más horas de las extras indicadas. El cálculo usa únicamente las horas disponibles.</div>';
+if(focused){const n=document.getElementById("editable-irpf");n.focus();try{n.setSelectionRange(cursor,cursor)}catch(e){}}
+}
+function render(){
+app.innerHTML=(screen==="calc"&&state.configured)?calculator():configScreen();
+if(screen==="calc"&&state.configured)refresh();
+}
+function modalHTML(){
+return '<div class="modalback" id="modalback"><div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="modal-title"><h2 id="modal-title">Revisa bien tus precios</h2>'+
+'<p>Comprueba el precio de la hora normal, de la hora extra y los importes precargados antes de calcular. Si alguno está mal, el resultado también lo estará.</p>'+
+'<div class="actions"><button class="ghost" type="button" data-action="cancelModal">Revisar</button><button class="primary" style="margin-top:0" type="button" data-action="confirmPrices">Son correctos</button></div></div></div>';
+}
+function validate(){
+const p=state.prices;
+if(parse(p.normalRate)<=0||parse(p.extraRate)<=0)return "Introduce un precio válido, mayor que cero, para la hora normal y la hora extra.";
+if(parse(p.irpf)>100)return "El IRPF no puede superar el 100 %.";
+return "";
+}
+app.addEventListener("input",ev=>{
+const el=ev.target;
+if(el.dataset.price){
+ const key=el.dataset.price;state.prices[key]=el.value;
+ if(key==="irpf"&&parse(el.value)>100)el.setCustomValidity("No puede superar el 100 %");else el.setCustomValidity("");
  save();
- var bar=document.getElementById("stickyGross");if(bar)bar.textContent=money(calc().gross);
+ if(screen==="calc") {
+  // Keep IRPF control focused without recreating it during edits.
+  const c=cash(),blocks=document.getElementById("results");
+  if(blocks){
+   const all=blocks.querySelectorAll(".inlinerow .value");
+   if(all[0])all[0].textContent="−"+curr(c.irpf);
+   if(all[1])all[1].textContent="−"+curr(c.ss);
+   const big=blocks.querySelector(".totalrow.large strong");if(big)big.textContent=curr(c.extraNet);
+   const detail=document.getElementById("details");if(detail)detail.innerHTML=detailed(c);
+  }
+ }
+ return;
 }
-document.addEventListener("change",function(e){
-var t=e.target;
-if(t.id==="import"){var file=t.files[0];if(!file)return;file.text().then(function(txt){var o=JSON.parse(txt);if(!o||!o.months||!o.settings)throw Error("Formato no válido");if(confirm("¿Importar copia y sustituir los datos actuales?")){d=o;d.settings=Object.assign({},S,d.settings||{});d.months=d.months||{};save();show()}}).catch(function(){alert("No se ha podido importar la copia JSON")});return}
-if(t.dataset.day){changeValue(null,t.dataset.key,t.value,t.dataset.day);return}
-if(t.dataset.target){changeValue(t.dataset.target,t.dataset.key,t.type==="checkbox"?t.checked:t.type==="number"?num(t.value):t.value);if(t.dataset.key==="mode")show()}
+if(el.dataset.val){state.values[el.dataset.val]=el.value;save();refresh()}
 });
-document.addEventListener("click",function(e){
-var t=e.target.closest("button");if(!t)return;
-if(t.dataset.tab){tab=t.dataset.tab;show();scrollTo(0,0)}
-if(t.id==="prev"||t.id==="next"){var v=month.split("-").map(Number),newD=new Date(v[0],v[1]-1+(t.id==="next"?1:-1),1);month=newD.getFullYear()+"-"+String(newD.getMonth()+1).padStart(2,"0");save();show()}
-if(t.id==="export"){var blob=new Blob([JSON.stringify(d,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="recarga-copia-"+month+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},1000)}
-if(t.id==="clear"&&confirm("¿Borrar todos los registros y ajustes mensuales de "+month+"?")){delete d.months[month];save();show()}
+app.addEventListener("change",ev=>{
+const el=ev.target;
+if(el.dataset.flag){
+ const flag=el.dataset.flag;
+ state.values[flag]=el.checked;
+ if(flag==="premium"&&!el.checked)state.values.week=false;
+ if(flag==="week"&&el.checked&&!state.values.premium){state.values.week=false;alert("Para comprar los cinco días marca primero la prima de recarga.");}
+ save();render();
+}
 });
-show();
-if("serviceWorker" in navigator&&location.protocol==="https:"){navigator.serviceWorker.register("./sw.js").catch(function(){})}
+app.addEventListener("click",ev=>{
+const button=ev.target.closest("[data-action]");if(!button)return;
+switch(button.dataset.action){
+case "settings":screen="settings";render();scrollTo(0,0);break;
+case "back":screen="calc";render();scrollTo(0,0);break;
+case "prepare":{
+ const err=validate();
+ const box=document.getElementById("validation");
+ if(err){if(box)box.innerHTML='<div class="error">'+err+'</div>';break;}
+ if(box)box.innerHTML="";
+ modal="prices";document.body.insertAdjacentHTML("beforeend",modalHTML());break;
+}
+case "cancelModal":document.getElementById("modalback")?.remove();modal="";break;
+case "confirmPrices":
+ document.getElementById("modalback")?.remove();modal="";
+ state.configured=true;screen="calc";save();render();scrollTo(0,0);
+ break;
+}
+});
+render();
+if("serviceWorker" in navigator && location.protocol==="https:")navigator.serviceWorker.register("./sw.js").catch(()=>{});
 })();
 </script>
-</body></html>
+</body>
+</html>
