@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f7f8fa"><title>Convenio ACS · Recarga Control</title>
+<style>body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f7f8fa;color:#1b2633}main{max-width:750px;padding:27px 20px 50px;margin:auto}h1{font-size:25px;letter-spacing:-.04em;line-height:1.25}h2{font-size:17px}.desc{color:#677688;font-size:14px;line-height:1.6}.card{background:#fff;border:1px solid #e4eaf0;border-radius:16px;padding:20px;margin:18px 0}.btn{display:inline-block;text-decoration:none;background:#356ca8;border-radius:11px;padding:13px 18px;color:#fff;font-size:14px;font-weight:750}.btn.alt{background:#eaf1fa;color:#2a5c92}.link{color:#2d64a1}#pdf{border:1px solid #dce4ec;border-radius:10px;width:100%;height:75vh;min-height:420px}.meta{font-size:12px;color:#758392}button{cursor:pointer}#doc{display:none}</style>
+</head><body><main><p class="meta"><a class="link" href="./">← Volver a Recarga Control</a></p><h1>Convenio ACS</h1><p class="desc">ACSA Obras e Infraestructuras · Centrales nucleares de Ascó y Vandellós II · Convenio 2025–2027.</p>
+<div id="doc" class="card"><h2>Convenio en PDF</h2><p class="desc">Puedes leer el documento aquí o descargarlo para consultarlo sin conexión.</p><p><a id="download" class="btn" href="./convenio-acsa-2025-2027.pdf" download>Descargar convenio ACS</a></p><iframe id="pdf" title="Convenio ACSA en PDF"></iframe></div>
+<div id="source" class="card"><h2>Consultar convenio</h2><p class="desc">La versión en PDF de las fotografías todavía no está alojada en este repositorio. Mientras tanto, puedes acceder a la ficha del convenio oficial publicado en el BOPT el 13 de diciembre de 2024.</p><a class="btn" target="_blank" rel="noopener noreferrer" href="https://cido.diba.cat/convenis_collectius/7584879/acsa-obras-e-infraestructuras-sau-centres-de-treball-de-cn-asco-i-cn-vandellos-ii">Abrir convenio oficial (CIDO)</a><p class="meta">Código de convenio: 43100451012018. La ficha oficial permite localizar el texto publicado del convenio.</p></div>
+</main><script>
+(async()=>{
+const path="./convenio-acsa-2025-2027.pdf";
+try{
+ const response=await fetch(path,{method:"HEAD",cache:"no-cache"});
+ if(response.ok&&(response.headers.get("content-type")||"").includes("pdf")){
+  document.getElementById("doc").style.display="block";
+  document.getElementById("source").style.display="none";
+  document.getElementById("pdf").src=path;
+ }
+}catch(e){}
+})();
+</script></body></html>
