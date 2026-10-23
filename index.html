@@ -251,7 +251,7 @@ if(el.dataset.flag){
  save();render();
 }
 });
-app.addEventListener("click",ev=>{
+document.addEventListener("click",ev=>{
 const button=ev.target.closest("[data-action]");if(!button)return;
 switch(button.dataset.action){
 case "settings":screen="settings";render();scrollTo(0,0);break;
