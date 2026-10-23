@@ -1,27 +1,37 @@
-# Recarga Control
+# Recarga Control (PWA)
 
-PWA (web instalable) para iPhone y Android diseñada para registrar las horas de recarga y estimar la nómina mensual.
+Calculadora sencilla para **toda la recarga**, aunque ocupe octubre, noviembre y diciembre. Se instala en iPhone o Android sin necesidad de publicar en las tiendas.
 
-### Funciones
-- Horas normales, extras, kilómetros, medias dietas, plus diario y festivo por cada día del mes.
-- Precio de la hora normal y extraordinaria editable por cada trabajador.
-- Salario ordinario configurable: por horas, mensual fijo o salario más complementos diarios.
-- Horas extras pagadas (por defecto ×1,5) o compensadas como días de descanso (por defecto ×1,75), con prima de horas compensadas ×0,5.
-- Retén semanal y festivo, prima de recarga, posibilidad de canjear 300 € por 5 días de descanso.
-- IRPF editable, Seguridad Social estimada y seguro de salud opcional (referencia de nómina: 41,67 € flexible + 22,17 € en especie).
-- Resumen bruto/neto mensual, guardado local, exportación e importación JSON, offline tras primera visita.
+## Cómo funciona
+1. **Primera vez:** nombre opcional, introduce tus precios de **hora normal** y **hora extra**. Los demás aparecen precargados pero son editables. Se muestra un aviso para verificar los precios antes de continuar.
+2. **Calculadora única:** escribe el total de horas normales, horas extras, medias dietas y kilómetros de **toda la recarga**.
+3. Marca solo lo que corresponda: **compensar horas extraordinarias**, **prima de recarga**, **comprar cinco días de descanso** y **otros pluses**.
+4. La aplicación calcula el **valor total generado bruto**, el **dinero adicional bruto** sin duplicar horas normales ya abonadas y el **dinero adicional neto estimado** (IRPF siempre editable). También muestra los días libres acumulados.
 
-### Publicación con GitHub Pages (gratis)
-En este repositorio abre **Settings → Pages**; en *Build and deployment* elige **Deploy from a branch**, rama **main**, carpeta **/(root)**, y pulsa **Save**.
+### Tarifas precargadas
+- **Hora normal y hora extra:** vacías y obligatorias, cada persona introduce las suyas.
+- **Media dieta:** 19,50 € y **kilometraje:** 0,47 €/km. Son importes de las tablas provinciales **2025**, publicados por CCOO; faltaba publicación de tablas nuevas 2026 al crear esta versión.
+- **Prima de recarga ACS 2026:** 625,46 €; cambio de cinco días por 300 €.
+- **IRPF:** 23 %, editable tanto en configuración como en pantalla de resultados.
+- Horas extras cobradas ×1,5; descanso ×1,75; prima económica al compensar ×0,5.
+- **Seguridad Social estimada:** cotización adicional de horas extraordinarias ordinarias 4,70 %; otras primas y pluses sujetos, cálculo orientativo del 6,50 % basado en una nómina facilitada. El importe real puede variar según distribución mensual y bases.
+- **Dietas/kilometraje:** se consideran exentos en el cálculo simplificado solo si cumplen sus requisitos. Si están sujetos o hay otros conceptos, puede cambiar el neto real.
 
-Cuando GitHub Pages termine de publicar, la dirección será:
+## No incluye
+No solicita meses/días, ni gestiona retén, ni seguros médicos, ni calcula las nóminas habituales. Las horas normales solo figuran en el **valor total generado**; ya están cobradas en las nóminas ordinarias y por eso no cuentan en el **dinero extra**.
 
-**https://jmendoza2727.github.io/Recarga/**
+## Instalación de GitHub Pages
+En GitHub abre **Settings → Pages** y elige **Deploy from a branch → main → /(root)**. 
+URL: https://jmendoza2727.github.io/Recarga/
 
-- **iPhone:** abre la URL con Safari, pulsa Compartir y Añadir a pantalla de inicio.
-- **Android:** abre la URL con Chrome, abre el menú ⋮ y elige Instalar aplicación.
+- **iOS:** Safari → Compartir → Añadir a pantalla de inicio.
+- **Android:** Chrome → menú → Instalar.
 
-### Privacidad y limitaciones
-La PWA no tiene cuentas ni servidor. Los registros permanecen en el almacenamiento de ese dispositivo, no se suben a GitHub. Debes exportar copia antes de cambiar de teléfono o borrar datos del navegador.
+Funciona sin conexión tras la primera visita. Datos locales mediante localStorage, sin cuenta ni envío de datos al repositorio.
 
-Los importes son orientativos: la nómina exacta puede variar por convenio aplicable, pagas extras, cotización, dietas no sujetas, periodos de liquidación, IRPF y otros conceptos. Las tarifas predeterminadas son un ejemplo personalizable y no una obligación salarial de la empresa.
+## Referencias
+- Tablas 2025 Tarragona: https://www.ccoo.cat/industria/wp-content/uploads/sites/109/2023/01/taules-salarials-metall-tarragona-2025.pdf
+- Estado convenio Tarragona 2026: https://www.ccoo.cat/industria/conveni-de-la-industria-siderometallurgica-de-tarragona/
+- Cotización 2026: https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores/10721/10957/9932/4315/4316?changeLanguage=es
+
+La app ofrece una **estimación**, no una nómina oficial, informe fiscal o dictamen jurídico.
