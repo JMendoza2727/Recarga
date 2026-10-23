@@ -1,4 +1,4 @@
-# Recarga Control (PWA)
+# Recargué (PWA)
 
 Calculadora sencilla para **toda la recarga**, aunque ocupe octubre, noviembre y diciembre. Se instala en iPhone o Android sin necesidad de publicar en las tiendas.
 
@@ -41,3 +41,19 @@ La app ofrece una **estimación**, no una nómina oficial, informe fiscal o dict
 Se muestra en **Configuración inicial** y en **Calculadora**. Abre la página \`convenio-acsa.html\`, que detecta si existe el archivo **\`convenio-acsa-2025-2027.pdf\`** en la raíz del repositorio y lo muestra integrado. Si todavía no está subido, ofrece la ficha oficial en CIDO.
 
 Para alojar en GitHub la copia escaneada de las 34 fotografías del convenio, abre la carpeta de archivos del proyecto, utiliza **Add file → Upload files**, elige **\`convenio-acsa-2025-2027.pdf\`** y confirma **Commit changes**. Así cualquier compañero podrá abrir el PDF desde ambos botones. No subir nóminas u otros documentos personales.
+
+## Publicación en Netlify
+El proyecto **recargacontrol** está creado en Netlify. Su dirección es **https://recargacontrol.netlify.app** cuando se publique el primer despliegue.
+En https://app.netlify.com/projects/recargacontrol hay que conectar el repositorio GitHub JMendoza2727/Recarga, rama main, sin comando de compilación y con directorio de publicación . (raíz).
+El proyecto incluye netlify.toml y .gitignore para evitar subir .netlify/.
+
+## Nombre e icono
+Al instalar la PWA se muestra **Recargué**, con icono azul oscuro de documento y euro. En iPhone: Safari → Compartir → Añadir a pantalla de inicio. En Android: Chrome → Instalar aplicación.
+
+## Migración de los datos entre dominios
+El almacenamiento local de github.io y netlify.app es independiente.
+1. Abre la aplicación de GitHub Pages; en Editar datos pulsa **Guardar copia**.
+2. Guarda el archivo recargue-mis-datos.json en el móvil.
+3. Abre la nueva aplicación de Netlify, ve a Configuración y pulsa **Importar copia**.
+4. Selecciona el archivo JSON, acepta la sustitución y verifica los importes antes de eliminar el acceso directo antiguo.
+Los registros se guardan únicamente en cada dispositivo; nunca se envían automáticamente al servidor.
