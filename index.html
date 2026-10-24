@@ -35,6 +35,11 @@ label.field input:disabled{background:#eef0f3}
 .readonly-rate span{font-size:13px;filter:grayscale(1);opacity:.55}
 
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 12px}.grid .full{grid-column:1/-1}
+.habitual-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px}
+.habitual-grid label.field{display:grid;grid-template-columns:minmax(0,1fr) 112px;align-items:center;gap:12px;border:1px solid #e3e9f0;border-radius:12px;padding:10px 12px;background:#fff;font-size:13px}
+.habitual-grid label.field input{text-align:center;height:44px}
+.habitual-grid label.field input:disabled{background:#e9edf2;color:#8795a6;border-color:#dce3eb}
+.habitual-grid label.field:has(input:disabled){background:#f7f9fb;color:#7a8898}
 .sep{height:1px;background:var(--line);margin:20px 0}.small{font-size:12px;color:var(--muted);line-height:1.55}.note{background:#f2f6fb;border:1px solid #e2eaf5;border-radius:11px;padding:13px;color:#415b78;font-size:12px;line-height:1.5;margin-top:16px}
 .primary{display:block;width:100%;border:0;background:var(--accent);color:white;font-weight:730;border-radius:12px;padding:14px 18px;min-height:49px;margin-top:18px}
 .secondary{border:1px solid #cad6e3;background:white;color:var(--accent);padding:11px 14px;border-radius:10px;font-weight:670}
@@ -187,14 +192,14 @@ field('Medias dietas','diets',v.diets,'val')+field('Kilómetros','km',v.km,'val'
 field('Días normales · 33,70 €/día','paradaNormal',v.paradaNormal,'val')+
 field('Sáb./dom./fest. · 74,15 €/día','paradaHoliday',v.paradaHoliday,'val')+
 '</div><p class="small" style="margin:13px 0 0">Tarifas de referencia de Tarragona 2025, pendientes de actualización oficial para 2026. Cuenta los días trabajados, no los días de descanso.</p>'+
-'<div class="sep"></div><h2>Complementos de nómina habitual</h2><div class="grid">'+
+'<div class="sep"></div><h2>Complementos de nómina habitual</h2><div class="habitual-grid">'+
 field('Días con P.T.P. · 9,58 €/día','ptpDays',v.ptpDays,'val')+
-field('Días con complemento nuclear · 6,61 €/día','nuclearDays',v.nuclearDays,'val')+
-field('Días con plus turno · 3,53 €/día','turnDays',v.ptpDays,'val')+
+field('Días con complemento nuclear · 6,61 €/día','nuclearDays',v.noNuclear?'0':v.nuclearDays,'val',{disabled:v.noNuclear})+
+field('Días con plus turno · 3,53 €/día','turnDays',v.noTurn?'0':v.ptpDays,'val',{disabled:v.noTurn})+
 '</div>'+
 check('No cobro complemento nuclear','noNuclear',v.noNuclear)+
 check('No cobro plus turno','noTurn',v.noTurn)+
-'<p class="small" style="margin:10px 0 0">Los tres campos comparten los mismos días: al cambiar cualquiera se actualizan los demás. Los ticks de nuclear y turno ponen solo su importe a 0 €, sin modificar los días. Los tres conceptos se incluyen en el bruto y neto total estimados; comprueba que la tarifa normal no los lleve ya incluidos.</p></section>'+
+'<p class="small" style="margin:10px 0 0">Los tres campos comparten los mismos días: al cambiar cualquiera se actualizan los demás. Al marcar «No cobro», su campo muestra 0 y deja de sumar al cálculo; al desmarcarlo recupera los días compartidos. Los tres conceptos se incluyen en el bruto y neto total estimados; comprueba que la tarifa normal no los lleve ya incluidos.</p></section>'+
 '<section class="panel"><h2>Complementos y descansos</h2>'+
 check('He compensado horas extras','comp',v.comp)+
 (v.comp?'<div class="reveal">'+field('Horas extras que compensas','compHours',v.compHours,'val',{placeholder:'Ej. 11'})+
@@ -305,7 +310,7 @@ if(el.dataset.val){
   state.values.ptpDays=el.value;
   state.values.nuclearDays=el.value;
   state.values.turnDays=el.value;
-  for(const other of ["ptpDays","nuclearDays","turnDays"]){const twin=app.querySelector('input[data-val="'+other+'"]');if(twin&&twin!==el)twin.value=el.value;}
+  for(const other of ["ptpDays","nuclearDays","turnDays"]){const twin=app.querySelector('input[data-val="'+other+'"]');if(twin&&twin!==el&&!twin.disabled)twin.value=el.value;}
  }else{
   state.values[key]=el.value;
  }
