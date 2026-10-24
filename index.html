@@ -80,7 +80,7 @@ summary{padding:15px 17px;cursor:pointer;font-size:13px;font-weight:700}
 (() => {
 "use strict";
 const KEY="recarga-control-simple-v3";
-const LOCKED=Object.freeze({dietRate:"19.50",kmRate:"0.47",premiumRate:"625.46",weekRate:"300"});
+const LOCKED=Object.freeze({dietRate:"23.83",kmRate:"0.47",premiumRate:"625.46",weekRate:"300"});
 const DEFAULT={name:"",normalRate:"",extraRate:"",...LOCKED,irpf:"23"};
 const PARADA=Object.freeze({normalDay:33.70,holidayDay:74.15}); // Tarifas del convenio provincial de Tarragona 2025; pendientes de publicación de tablas 2026.
 const EMPTY={normal:"",extra:"",diets:"",km:"",paradaNormal:"",paradaHoliday:"",comp:false,compHours:"",premium:false,week:false,other:false,otherAmount:""};
@@ -143,7 +143,7 @@ return (settings?header(true):'<div class="header"><div class="brand"><img class
 field('Hora normal (€/h)','normalRate',p.normalRate,'price',{required:true,placeholder:'Obligatorio'})+
 field('Hora extra (€/h)','extraRate',p.extraRate,'price',{required:true,placeholder:'Obligatorio'})+
 '</div><div class="sep"></div><h2>Importes fijos de referencia</h2><div class="grid">'+
-fixedPrice('Media dieta','19,50 €')+
+fixedPrice('Media dieta','23,83 €')+
 fixedPrice('Kilometraje','0,47 €/km')+
 fixedPrice('Prima de recarga','625,46 €')+
 field('IRPF (%) · editable','irpf',p.irpf,'price')+
