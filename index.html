@@ -117,15 +117,17 @@ function cash(){
  const paradaTotal=paradaNormal+paradaHoliday;
  const paidPrime=v.premium?Math.max(0,parse(p.premiumRate)-(v.week?parse(p.weekRate):0)):0;
  const other=v.other?parse(v.otherAmount):0;
- const extraGross=paidExtra+compPremium+travel+paradaTotal+paidPrime+other;
- const totalGross=hourlyNormal+habitualPay+extraGross;
- const taxable=paidExtra+compPremium+paradaTotal+paidPrime+other;
+ const complementsGross=paidExtra+compPremium+travel+paradaTotal+paidPrime+other;
+ const totalGross=hourlyNormal+habitualPay+complementsGross;
+ // Incluye todos los conceptos salariales, también horas normales, P.T.P. y nuclear.
+ // Dietas y km se presumen exentos cuando cumplen requisitos legales.
+ const taxable=totalGross-travel;
  const irpf=taxable*parse(p.irpf)/100;
  const ssExtra=paidExtra*.047;
- const ssCommon=(compPremium+paradaTotal+paidPrime+other)*.065;
+ const ssCommon=(hourlyNormal+habitualPay+compPremium+paradaTotal+paidPrime+other)*.065;
  const ss=ssExtra+ssCommon;
- const extraNet=extraGross-irpf-ss;
- return {hNormal,hExtra,requested,valid,restH,paidH,hourlyNormal,ptpPay,nuclearPay,habitualPay,paidExtra,compPremium,travel,paradaNormal,paradaHoliday,paradaTotal,paidPrime,other,extraGross,totalGross,taxable,irpf,ssExtra,ssCommon,ss,extraNet,days:restH*1.75/8+(v.week&&v.premium?5:0),compDays:restH*1.75/8};
+ const totalNet=totalGross-irpf-ss;
+ return {hNormal,hExtra,requested,valid,restH,paidH,hourlyNormal,ptpPay,nuclearPay,habitualPay,paidExtra,compPremium,travel,paradaNormal,paradaHoliday,paradaTotal,paidPrime,other,complementsGross,totalGross,taxable,irpf,ssExtra,ssCommon,ss,totalNet,days:restH*1.75/8+(v.week&&v.premium?5:0),compDays:restH*1.75/8};
 }
 function field(label,key,value,target,opts={}){
  const type=opts.text?"text":"number",placeholder=opts.placeholder||"0",step=type==="number"?'step="any" min="0" inputmode="decimal"':"",required=opts.required?' aria-required="true"':"",disabled=opts.disabled?' disabled aria-disabled="true"':"";
@@ -196,7 +198,7 @@ check('Tengo algún plus adicional','other',v.other)+
 }
 function detailed(c){
 return [
-['Horas normales (solo valor total)',c.hourlyNormal],
+['Horas normales',c.hourlyNormal],
 ['P.T.P. habitual (9,58 €/día)',c.ptpPay],
 ['Complemento nuclear habitual (6,61 €/día)',c.nuclearPay],
 ['Horas extras cobradas (×1,5)',c.paidExtra],
@@ -206,26 +208,24 @@ return [
 ['Plus parada fines de semana/festivos (74,15 €/día)',c.paradaHoliday],
 ['Prima recarga, descontada compra',c.paidPrime],
 ['Otros complementos',c.other],
-['Valor total generado',c.totalGross],
-['Dinero extra bruto',c.extraGross],
-['IRPF estimado sobre lo sujeto a retención',-c.irpf],
-['Cotización adicional extras (4,70 %)',-c.ssExtra],
-['Cotización ordinaria de otros pluses (6,50 %)',-c.ssCommon],
-['Dinero extra neto estimado',c.extraNet]
+['Total generado bruto',c.totalGross],
+['IRPF estimado (conceptos sujetos)',-c.irpf],
+['Cotización de horas extras (4,70 %)',-c.ssExtra],
+['Seguridad Social resto salario (6,50 %)',-c.ssCommon],
+['Total generado neto estimado',c.totalNet]
 ].map(([n,v])=>'<div class="detailrow"><span>'+n+'</span><span>'+curr(v)+'</span></div>').join('')+
-'<div class="note">Las horas normales, el P.T.P. y el complemento nuclear se muestran únicamente en el valor total porque ya pueden estar incluidos en las nóminas habituales; no se suman otra vez al dinero extra. Las dietas y el kilometraje se consideran exentos en esta simulación si cumplen los requisitos legales; de otro modo el neto real será menor. Los pluses de parada sí se incluyen como salario sujeto a IRPF y a cotización estimada. Los importes diarios de parada son referencias de 2025 pendientes de las tablas oficiales 2026. La cotización exacta también depende de la distribución entre nóminas y sus bases.</div>';
+'<div class="note">Este resumen incluye todo lo introducido: horas normales, P.T.P., complemento nuclear, extras, pluses y primas. Las horas normales y los complementos habituales ya pueden figurar en las nóminas ordinarias; el neto total NO representa dinero adicional que cobrarás aparte. Las dietas y los kilómetros se consideran exentos solo cuando cumplan los requisitos legales. El cálculo real depende de las nóminas, bases de cotización y situación fiscal de cada trabajador.</div>';
 }
 function resultHTML(c){
 return '<h2>Resultado de la recarga</h2>'+
 '<div class="totalrow"><span>Valor total generado (bruto)</span><strong>'+curr(c.totalGross)+'</strong></div>'+
-'<div class="totalrow"><span>Dinero extra generado (bruto)</span><strong>'+curr(c.extraGross)+'</strong></div>'+
-'<div class="explain">Las horas normales, el P.T.P. y el complemento nuclear solo cuentan en el valor total, no en el dinero extra, porque normalmente ya se cobran en las nóminas habituales. Revisa que tu tarifa normal no los incluya para evitar duplicidades.</div>'+
+'<div class="explain">Incluye horas normales, horas extras, P.T.P., complemento nuclear, pluses, dietas y primas. Es el valor de toda la recarga, no dinero adicional a tus nóminas habituales. Comprueba que tu tarifa normal no incluya ya P.T.P. o nuclear para evitar duplicidades.</div>'+
 '<div class="irpf"><label for="editable-irpf">IRPF (%) · editable siempre</label><input id="editable-irpf" type="number" inputmode="decimal" step="any" min="0" max="100" data-price="irpf" value="'+escapeHTML(state.prices.irpf)+'"></div>'+
 '<div class="inlinerow"><span>IRPF estimado</span><span class="value">−'+curr(c.irpf)+'</span></div>'+
 '<div class="inlinerow"><span>Seguridad Social estimada</span><span class="value">−'+curr(c.ss)+'</span></div>'+
-'<div class="totalrow large"><span><b>Dinero extra neto estimado</b></span><strong>'+curr(c.extraNet)+'</strong></div>'+
+'<div class="totalrow large"><span><b>Valor total generado (neto estimado)</b></span><strong>'+curr(c.totalNet)+'</strong></div>'+
 '<div class="totalrow"><span>Días libres conseguidos</span><strong>'+fmt(c.days)+' días</strong></div>'+
-'<p class="small">Se aplica un 4,70 % a las horas extras cobradas y una estimación del 6,50 % a las primas y otros pluses sujetos a cotización. Dietas y km se consideran exentos solo si cumplen los requisitos legales.</p>';
+'<p class="small">El IRPF se estima sobre los conceptos salariales, incluidas las horas normales. Se aplica un 4,70 % a las horas extras cobradas y un 6,50 % estimado al resto del salario cotizable. Dietas y km solo quedan exentos cuando cumplen los requisitos legales. No sustituye a tus nóminas.</p>';
 }
 function refresh(){
 if(screen!=="calc")return;
@@ -269,7 +269,7 @@ if(el.dataset.price){
    const all=blocks.querySelectorAll(".inlinerow .value");
    if(all[0])all[0].textContent="−"+curr(c.irpf);
    if(all[1])all[1].textContent="−"+curr(c.ss);
-   const big=blocks.querySelector(".totalrow.large strong");if(big)big.textContent=curr(c.extraNet);
+   const big=blocks.querySelector(".totalrow.large strong");if(big)big.textContent=curr(c.totalNet);
    const detail=document.getElementById("details");if(detail)detail.innerHTML=detailed(c);
   }
  }
