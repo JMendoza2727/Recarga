@@ -3,6 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<script>
+// Se registra antes de dibujar la interfaz para bloquear gestos de ampliación.
+(function(){
+ const prevent=e=>{if(e.cancelable)e.preventDefault();};
+ for(const name of ["gesturestart","gesturechange","gestureend"]){
+  window.addEventListener(name,prevent,{capture:true,passive:false});
+  document.addEventListener(name,prevent,{capture:true,passive:false});
+ }
+ document.addEventListener("touchmove",e=>{
+  if(e.touches.length>1)prevent(e);
+ },{capture:true,passive:false});
+})();
+</script>
 <meta name="theme-color" content="#f7f8fa">
 <meta name="description" content="Calcula cuánto dinero adicional y cuántos días libres generas durante la recarga.">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,7 +24,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" href="./icons/recargue-192.png">
 <link rel="apple-touch-icon" sizes="192x192" href="./icons/recargue-192.png">
-<title>Recargué</title>
+<title>Recargué · versión 28</title>
 <style>
 :root{color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:16px;--bg:#f7f8fa;--panel:#fff;--ink:#1b2633;--muted:#667483;--line:#e5eaf0;--field:#f4f6f8;--accent:#2f69aa;--green:#176746}
 *{box-sizing:border-box}html{min-height:100%}body{margin:0;background:var(--bg);color:var(--ink);line-height:1.4;-webkit-tap-highlight-color:transparent}
@@ -395,14 +408,6 @@ window.addEventListener("beforeinstallprompt",ev=>{ev.preventDefault();deferredI
 window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;document.getElementById("install-popup")?.remove();});
 if(isMobile()&&!isInstalled())setTimeout(installPopup,1100);
 
-// iOS Safari permite pellizcar incluso con user-scalable=no.
-// Cancelar gestos de zoom sin impedir el desplazamiento con un dedo.
-document.addEventListener("gesturestart",event=>event.preventDefault(),{passive:false});
-document.addEventListener("gesturechange",event=>event.preventDefault(),{passive:false});
-document.addEventListener("gestureend",event=>event.preventDefault(),{passive:false});
-document.addEventListener("touchmove",event=>{
- if(event.touches.length>1)event.preventDefault();
-},{passive:false});
 // Recarga la interfaz cuando una nueva versión del Service Worker toma el control.
 // Evita recargas infinitas y no modifica los datos locales.
 let refreshedForUpdate=false;
