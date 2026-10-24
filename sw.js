@@ -1,5 +1,5 @@
 // Recargué: cache-first para usar la calculadora instalada incluso en modo avión.
-const CACHE="recargue-offline-v18";
+const CACHE="recargue-offline-v19";
 const CORE=["./","./index.html","./manifest.webmanifest","./convenio-acsa.html","./icons/recargue-192.png","./icons/recargue.svg"];
 const SCOPE=self.registration.scope;
 const localUrl=path=>new URL(path,SCOPE).href;
@@ -23,6 +23,8 @@ self.addEventListener("fetch",event=>{
  if(request.method!=="GET")return;
  const url=new URL(request.url);
  if(url.origin!==self.location.origin||!url.href.startsWith(SCOPE))return;
+ // Los visores PDF de iOS utilizan solicitudes Range; no interceptarlas.
+ if(url.pathname.toLowerCase().endsWith(".pdf")||request.headers.has("range"))return;
  event.respondWith((async()=>{
   const cache=await caches.open(CACHE);
   const hit=await cache.match(request,{ignoreSearch:true});
