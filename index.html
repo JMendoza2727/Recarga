@@ -94,7 +94,7 @@ const LOCKED=Object.freeze({dietRate:"23.83",kmRate:"0.47",premiumRate:"625.46",
 const DEFAULT={name:"",normalRate:"",extraRate:"",...LOCKED,irpf:"23"};
 const PARADA=Object.freeze({normalDay:33.70,holidayDay:74.15}); // Tarifas del convenio provincial de Tarragona 2025; pendientes de publicación de tablas 2026.
 const ORDINARY=Object.freeze({ptpDay:9.58,nuclearDay:6.61,turnDay:3.53}); // Importes diarios de referencia de nómina ACSA.
-const EMPTY={normal:"",extra:"",diets:"",km:"",paradaNormal:"",paradaHoliday:"",ptpDays:"",nuclearDays:"",noNuclear:false,noTurn:false,comp:false,compHours:"",premium:false,week:false,other:false,otherAmount:""};
+const EMPTY={normal:"",extra:"",diets:"",km:"",paradaNormal:"",paradaHoliday:"",ptpDays:"",nuclearDays:"",noNuclear:false,noTurn:false,comp:false,compHours:"",reten:false,retenNormal:"",retenHoliday:"",premium:false,week:false,other:false,otherAmount:""};
 // Un mismo día trabajado da lugar a ambos complementos cuando se perciben.
 // Se conservan ambas claves de almacenamiento para que funcionen las copias antiguas.
 function syncHabitualDays(v){
@@ -210,6 +210,8 @@ check('He compensado horas extras','comp',v.comp)+
 '<div class="statusline"><span>Descanso conseguido</span><b id="compDays">'+fmt(c.compDays)+' días</b></div>'+
 '<div class="statusline"><span>Prima por compensación</span><b id="compCash">'+curr(c.compPremium)+'</b></div>'+
 '<div id="hoursWarn">'+(!c.valid?'<div class="error">Has compensado más horas de las extras indicadas. El cálculo usa únicamente las horas disponibles.</div>':'')+'</div></div>':'')+
+check('He hecho retén','reten',v.reten)+
+(v.reten?'<div class="reveal"><div class="habitual-grid">'+field('Días normales de retén','retenNormal',v.retenNormal,'val')+field('Sábados, domingos y festivos de retén','retenHoliday',v.retenHoliday,'val')+'</div><p class="small">Días de retén registrados. Pendiente de confirmar las tarifas para incluirlos en el cálculo económico.</p></div>':'')+
 check('Cobro la prima de recarga','premium',v.premium)+
 check('He comprado 5 días de descanso','week',v.week)+
 (v.week?'<div class="reveal"><div class="statusline"><span>Días libres adicionales</span><b>5 días</b></div><div class="statusline"><span>Descuento de la prima</span><b>−'+curr(parse(p.weekRate))+'</b></div>'+(v.premium?'':'<div class="error">Para comprar los cinco días debe estar activada la prima de recarga.</div>')+'</div>':'')+
@@ -218,7 +220,7 @@ check('Tengo algún plus adicional','other',v.other)+
 '</section>'+
 '<section class="panel totals" id="results"></section>'+
 '<details id="detail"><summary>Ver desglose completo</summary><div class="detailbody" id="details"></div></details>'+
-'<p class="offline-state" id="offline-status" role="status" aria-live="polite"></p><p class="foot">Estimación orientativa de la recarga, no una nómina oficial. No incluye retén ni seguro médico. Se guarda automáticamente.</p>';
+'<p class="offline-state" id="offline-status" role="status" aria-live="polite"></p><p class="foot">Estimación orientativa de la recarga, no una nómina oficial. El retén se registra pero todavía no se suma al cálculo económico; no incluye seguro médico. Se guarda automáticamente.</p>';
 }
 function detailed(c){
 return [
