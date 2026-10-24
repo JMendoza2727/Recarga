@@ -395,6 +395,14 @@ window.addEventListener("beforeinstallprompt",ev=>{ev.preventDefault();deferredI
 window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;document.getElementById("install-popup")?.remove();});
 if(isMobile()&&!isInstalled())setTimeout(installPopup,1100);
 
+// iOS Safari permite pellizcar incluso con user-scalable=no.
+// Cancelar gestos de zoom sin impedir el desplazamiento con un dedo.
+document.addEventListener("gesturestart",event=>event.preventDefault(),{passive:false});
+document.addEventListener("gesturechange",event=>event.preventDefault(),{passive:false});
+document.addEventListener("gestureend",event=>event.preventDefault(),{passive:false});
+document.addEventListener("touchmove",event=>{
+ if(event.touches.length>1)event.preventDefault();
+},{passive:false});
 // Recarga la interfaz cuando una nueva versión del Service Worker toma el control.
 // Evita recargas infinitas y no modifica los datos locales.
 let refreshedForUpdate=false;
