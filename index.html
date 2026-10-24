@@ -35,6 +35,9 @@ label.field input:disabled{background:#eef0f3}
 .readonly-rate span{font-size:13px;filter:grayscale(1);opacity:.55}
 
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 12px}.grid .full{grid-column:1/-1}
+.parada-grid{grid-template-columns:1fr;gap:11px}
+.parada-grid label.field{display:grid;grid-template-columns:minmax(0,1fr) 112px;align-items:center;gap:12px;padding:10px 12px;border:1px solid #e3e9f0;border-radius:12px;background:#fff;font-size:13px}
+.parada-grid label.field input{height:44px;text-align:center}
 .habitual-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px}
 .habitual-grid label.field{display:grid;grid-template-columns:minmax(0,1fr) 112px;align-items:center;gap:12px;border:1px solid #e3e9f0;border-radius:12px;padding:10px 12px;background:#fff;font-size:13px}
 .habitual-grid label.field input{text-align:center;height:44px}
@@ -188,9 +191,9 @@ return header(false)+'<h1>'+(p.name?'Recarga de '+escapeHTML(p.name):'Calculador
 '<section class="panel"><h2>Horas y desplazamientos</h2><div class="grid">'+
 field('Horas normales','normal',v.normal,'val')+field('Horas extras','extra',v.extra,'val')+
 field('Medias dietas','diets',v.diets,'val')+field('Kilómetros','km',v.km,'val')+
-'</div><div class="sep"></div><h2>Plus de parada · días trabajados</h2><div class="grid">'+
+'</div><div class="sep"></div><h2>Plus de parada · días trabajados</h2><div class="grid parada-grid">'+
 field('Días normales · 33,70 €/día','paradaNormal',v.paradaNormal,'val')+
-field('Sáb./dom./fest. · 74,15 €/día','paradaHoliday',v.paradaHoliday,'val')+
+field('Sábados, domingos y festivos · 74,15 €/día','paradaHoliday',v.paradaHoliday,'val')+
 '</div><p class="small" style="margin:13px 0 0">Tarifas de referencia de Tarragona 2025, pendientes de actualización oficial para 2026. Cuenta los días trabajados, no los días de descanso.</p>'+
 '<div class="sep"></div><h2>Complementos de nómina habitual</h2><div class="habitual-grid">'+
 field('Días con P.T.P. · 9,58 €/día','ptpDays',v.ptpDays,'val')+
