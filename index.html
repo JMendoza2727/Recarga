@@ -83,7 +83,8 @@ const KEY="recarga-control-simple-v3";
 const LOCKED=Object.freeze({dietRate:"23.83",kmRate:"0.47",premiumRate:"625.46",weekRate:"300"});
 const DEFAULT={name:"",normalRate:"",extraRate:"",...LOCKED,irpf:"23"};
 const PARADA=Object.freeze({normalDay:33.70,holidayDay:74.15}); // Tarifas del convenio provincial de Tarragona 2025; pendientes de publicación de tablas 2026.
-const EMPTY={normal:"",extra:"",diets:"",km:"",paradaNormal:"",paradaHoliday:"",comp:false,compHours:"",premium:false,week:false,other:false,otherAmount:""};
+const ORDINARY=Object.freeze({ptpDay:9.58,nuclearDay:6.61}); // Importes diarios de referencia de nómina ACSA.
+const EMPTY={normal:"",extra:"",diets:"",km:"",paradaNormal:"",paradaHoliday:"",ptpDays:"",nuclearDays:"",noNuclear:false,comp:false,compHours:"",premium:false,week:false,other:false,otherAmount:""};
 let state={configured:false,prices:{...DEFAULT},values:{...EMPTY}},screen="start",modal="";
 try{
  const prior=JSON.parse(localStorage.getItem(KEY)||"null");
@@ -105,6 +106,9 @@ function cash(){
  const hNormal=parse(v.normal),hExtra=parse(v.extra),requested=v.comp?parse(v.compHours):0;
  const valid=requested<=hExtra,restH=Math.min(requested,hExtra),paidH=hExtra-restH;
  const hourlyNormal=hNormal*parse(p.normalRate);
+ const ptpPay=parse(v.ptpDays)*ORDINARY.ptpDay;
+ const nuclearPay=v.noNuclear?0:parse(v.nuclearDays)*ORDINARY.nuclearDay;
+ const habitualPay=ptpPay+nuclearPay;
  const paidExtra=paidH*parse(p.extraRate)*1.5;
  const compPremium=restH*parse(p.extraRate)*.5;
  const travel=parse(v.diets)*parse(p.dietRate)+parse(v.km)*parse(p.kmRate);
@@ -114,18 +118,18 @@ function cash(){
  const paidPrime=v.premium?Math.max(0,parse(p.premiumRate)-(v.week?parse(p.weekRate):0)):0;
  const other=v.other?parse(v.otherAmount):0;
  const extraGross=paidExtra+compPremium+travel+paradaTotal+paidPrime+other;
- const totalGross=hourlyNormal+extraGross;
+ const totalGross=hourlyNormal+habitualPay+extraGross;
  const taxable=paidExtra+compPremium+paradaTotal+paidPrime+other;
  const irpf=taxable*parse(p.irpf)/100;
  const ssExtra=paidExtra*.047;
  const ssCommon=(compPremium+paradaTotal+paidPrime+other)*.065;
  const ss=ssExtra+ssCommon;
  const extraNet=extraGross-irpf-ss;
- return {hNormal,hExtra,requested,valid,restH,paidH,hourlyNormal,paidExtra,compPremium,travel,paradaNormal,paradaHoliday,paradaTotal,paidPrime,other,extraGross,totalGross,taxable,irpf,ssExtra,ssCommon,ss,extraNet,days:restH*1.75/8+(v.week&&v.premium?5:0),compDays:restH*1.75/8};
+ return {hNormal,hExtra,requested,valid,restH,paidH,hourlyNormal,ptpPay,nuclearPay,habitualPay,paidExtra,compPremium,travel,paradaNormal,paradaHoliday,paradaTotal,paidPrime,other,extraGross,totalGross,taxable,irpf,ssExtra,ssCommon,ss,extraNet,days:restH*1.75/8+(v.week&&v.premium?5:0),compDays:restH*1.75/8};
 }
 function field(label,key,value,target,opts={}){
- const type=opts.text?"text":"number",placeholder=opts.placeholder||"0",step=type==="number"?'step="any" min="0" inputmode="decimal"':"",required=opts.required?' aria-required="true"':"";
- return '<label class="field '+(opts.full?"full":"")+'"><span>'+label+'</span><input type="'+type+'" '+step+required+' data-'+target+'="'+key+'" value="'+escapeHTML(value)+'" placeholder="'+escapeHTML(placeholder)+'" autocomplete="off"></label>';
+ const type=opts.text?"text":"number",placeholder=opts.placeholder||"0",step=type==="number"?'step="any" min="0" inputmode="decimal"':"",required=opts.required?' aria-required="true"':"",disabled=opts.disabled?' disabled aria-disabled="true"':"";
+ return '<label class="field '+(opts.full?"full":"")+'"><span>'+label+'</span><input type="'+type+'" '+step+required+disabled+' data-'+target+'="'+key+'" value="'+escapeHTML(value)+'" placeholder="'+escapeHTML(placeholder)+'" autocomplete="off"></label>';
 }
 function header(settings){
 return '<div class="header"><div class="brand"><img class="appmark" src="./icons/recargue-192.png" alt=""><div><div class="brandname">Recargué</div><div class="subbrand">Tu calculadora de recarga</div></div></div>'+ (settings?'<button class="editbtn" type="button" data-action="back" aria-label="Volver a la calculadora">← Volver</button>':'<button class="editbtn" type="button" data-action="settings" aria-label="Editar datos y precios">Editar datos</button>')+'</div>';
@@ -167,7 +171,13 @@ field('Medias dietas','diets',v.diets,'val')+field('Kilómetros','km',v.km,'val'
 '</div><div class="sep"></div><h2>Plus de parada · días trabajados</h2><div class="grid">'+
 field('Días normales · 33,70 €/día','paradaNormal',v.paradaNormal,'val')+
 field('Sáb./dom./fest. · 74,15 €/día','paradaHoliday',v.paradaHoliday,'val')+
-'</div><p class="small" style="margin:13px 0 0">Tarifas de referencia de Tarragona 2025, pendientes de actualización oficial para 2026. Cuenta los días trabajados, no los días de descanso.</p></section>'+
+'</div><p class="small" style="margin:13px 0 0">Tarifas de referencia de Tarragona 2025, pendientes de actualización oficial para 2026. Cuenta los días trabajados, no los días de descanso.</p>'+
+'<div class="sep"></div><h2>Complementos de nómina habitual</h2><div class="grid">'+
+field('Días con P.T.P. · 9,58 €/día','ptpDays',v.ptpDays,'val')+
+field('Días con plus nuclear · 6,61 €/día','nuclearDays',v.nuclearDays,'val',{disabled:v.noNuclear})+
+'</div>'+
+check('No cobro complemento nuclear','noNuclear',v.noNuclear)+
+'<p class="small" style="margin:10px 0 0">El P.T.P. y el complemento nuclear se añaden al valor total, pero no al dinero extra: normalmente ya se cobran en la nómina habitual. Si tu precio de hora normal ya los incluye, evita contarlos dos veces.</p></section>'+
 '<section class="panel"><h2>Complementos y descansos</h2>'+
 check('He compensado horas extras','comp',v.comp)+
 (v.comp?'<div class="reveal">'+field('Horas extras que compensas','compHours',v.compHours,'val',{placeholder:'Ej. 11'})+
@@ -187,6 +197,8 @@ check('Tengo algún plus adicional','other',v.other)+
 function detailed(c){
 return [
 ['Horas normales (solo valor total)',c.hourlyNormal],
+['P.T.P. habitual (9,58 €/día)',c.ptpPay],
+['Complemento nuclear habitual (6,61 €/día)',c.nuclearPay],
 ['Horas extras cobradas (×1,5)',c.paidExtra],
 ['Prima de horas compensadas (×0,5)',c.compPremium],
 ['Dietas y kilometraje',c.travel],
@@ -201,13 +213,13 @@ return [
 ['Cotización ordinaria de otros pluses (6,50 %)',-c.ssCommon],
 ['Dinero extra neto estimado',c.extraNet]
 ].map(([n,v])=>'<div class="detailrow"><span>'+n+'</span><span>'+curr(v)+'</span></div>').join('')+
-'<div class="note">Las horas normales se muestran únicamente en el valor total: ya se abonan en las nóminas habituales. Las dietas y el kilometraje se consideran exentos en esta simulación si cumplen los requisitos legales; de otro modo el neto real será menor. Los pluses de parada sí se incluyen como salario sujeto a IRPF y a cotización estimada. Los importes diarios de parada son referencias de 2025 pendientes de las tablas oficiales 2026. La cotización exacta también depende de la distribución entre nóminas y sus bases.</div>';
+'<div class="note">Las horas normales, el P.T.P. y el complemento nuclear se muestran únicamente en el valor total porque ya pueden estar incluidos en las nóminas habituales; no se suman otra vez al dinero extra. Las dietas y el kilometraje se consideran exentos en esta simulación si cumplen los requisitos legales; de otro modo el neto real será menor. Los pluses de parada sí se incluyen como salario sujeto a IRPF y a cotización estimada. Los importes diarios de parada son referencias de 2025 pendientes de las tablas oficiales 2026. La cotización exacta también depende de la distribución entre nóminas y sus bases.</div>';
 }
 function resultHTML(c){
 return '<h2>Resultado de la recarga</h2>'+
 '<div class="totalrow"><span>Valor total generado (bruto)</span><strong>'+curr(c.totalGross)+'</strong></div>'+
 '<div class="totalrow"><span>Dinero extra generado (bruto)</span><strong>'+curr(c.extraGross)+'</strong></div>'+
-'<div class="explain">Las horas normales no se incluyen en el dinero extra porque ya se cobran en las nóminas habituales. Sumarlas otra vez duplicaría ese ingreso.</div>'+
+'<div class="explain">Las horas normales, el P.T.P. y el complemento nuclear solo cuentan en el valor total, no en el dinero extra, porque normalmente ya se cobran en las nóminas habituales. Revisa que tu tarifa normal no los incluya para evitar duplicidades.</div>'+
 '<div class="irpf"><label for="editable-irpf">IRPF (%) · editable siempre</label><input id="editable-irpf" type="number" inputmode="decimal" step="any" min="0" max="100" data-price="irpf" value="'+escapeHTML(state.prices.irpf)+'"></div>'+
 '<div class="inlinerow"><span>IRPF estimado</span><span class="value">−'+curr(c.irpf)+'</span></div>'+
 '<div class="inlinerow"><span>Seguridad Social estimada</span><span class="value">−'+curr(c.ss)+'</span></div>'+
