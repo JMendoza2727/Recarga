@@ -93,6 +93,7 @@ const KEY="recarga-control-simple-v3";
 const LOCKED=Object.freeze({dietRate:"23.83",kmRate:"0.47",premiumRate:"625.46",weekRate:"300"});
 const DEFAULT={name:"",normalRate:"",extraRate:"",...LOCKED,irpf:"23"};
 const PARADA=Object.freeze({normalDay:33.70,holidayDay:74.15}); // Tarifas del convenio provincial de Tarragona 2025; pendientes de publicación de tablas 2026.
+const RETEN={normalDay:28.60,holidayDay:71.51};
 const ORDINARY=Object.freeze({ptpDay:9.58,nuclearDay:6.61,turnDay:3.53}); // Importes diarios de referencia de nómina ACSA.
 const EMPTY={normal:"",extra:"",diets:"",km:"",paradaNormal:"",paradaHoliday:"",ptpDays:"",nuclearDays:"",noNuclear:false,noTurn:false,comp:false,compHours:"",reten:false,retenNormal:"",retenHoliday:"",premium:false,week:false,other:false,otherAmount:""};
 // Un mismo día trabajado da lugar a ambos complementos cuando se perciben.
@@ -138,18 +139,21 @@ function cash(){
  const paradaHoliday=parse(v.paradaHoliday)*PARADA.holidayDay;
  const paradaTotal=paradaNormal+paradaHoliday;
  const paidPrime=v.premium?Math.max(0,parse(p.premiumRate)-(v.week?parse(p.weekRate):0)):0;
+ const retenNormal=v.reten?parse(v.retenNormal)*RETEN.normalDay:0;
+ const retenHoliday=v.reten?parse(v.retenHoliday)*RETEN.holidayDay:0;
+ const retenTotal=retenNormal+retenHoliday;
  const other=v.other?parse(v.otherAmount):0;
- const complementsGross=paidExtra+compPremium+travel+paradaTotal+paidPrime+other;
+ const complementsGross=paidExtra+compPremium+travel+paradaTotal+paidPrime+retenTotal+other;
  const totalGross=hourlyNormal+habitualPay+complementsGross;
  // Incluye todos los conceptos salariales, también horas normales, P.T.P. y nuclear.
  // Dietas y km se presumen exentos cuando cumplen requisitos legales.
  const taxable=totalGross-travel;
  const irpf=taxable*parse(p.irpf)/100;
  const ssExtra=paidExtra*.047;
- const ssCommon=(hourlyNormal+habitualPay+compPremium+paradaTotal+paidPrime+other)*.065;
+ const ssCommon=(hourlyNormal+habitualPay+compPremium+paradaTotal+paidPrime+retenTotal+other)*.065;
  const ss=ssExtra+ssCommon;
  const totalNet=totalGross-irpf-ss;
- return {hNormal,hExtra,requested,valid,restH,paidH,hourlyNormal,ptpPay,nuclearPay,turnPay,habitualPay,paidExtra,compPremium,travel,paradaNormal,paradaHoliday,paradaTotal,paidPrime,other,complementsGross,totalGross,taxable,irpf,ssExtra,ssCommon,ss,totalNet,days:restH*1.75/8+(v.week&&v.premium?5:0),compDays:restH*1.75/8};
+ return {hNormal,hExtra,requested,valid,restH,paidH,hourlyNormal,ptpPay,nuclearPay,turnPay,habitualPay,paidExtra,compPremium,travel,paradaNormal,paradaHoliday,paradaTotal,paidPrime,retenNormal,retenHoliday,retenTotal,other,complementsGross,totalGross,taxable,irpf,ssExtra,ssCommon,ss,totalNet,days:restH*1.75/8+(v.week&&v.premium?5:0),compDays:restH*1.75/8};
 }
 function field(label,key,value,target,opts={}){
  const type=opts.text?"text":"number",placeholder=opts.placeholder||"0",step=type==="number"?'step="any" min="0" inputmode="decimal"':"",required=opts.required?' aria-required="true"':"",disabled=opts.disabled?' disabled aria-disabled="true"':"";
@@ -211,7 +215,7 @@ check('He compensado horas extras','comp',v.comp)+
 '<div class="statusline"><span>Prima por compensación</span><b id="compCash">'+curr(c.compPremium)+'</b></div>'+
 '<div id="hoursWarn">'+(!c.valid?'<div class="error">Has compensado más horas de las extras indicadas. El cálculo usa únicamente las horas disponibles.</div>':'')+'</div></div>':'')+
 check('He hecho retén','reten',v.reten)+
-(v.reten?'<div class="reveal"><div class="habitual-grid">'+field('Días normales de retén','retenNormal',v.retenNormal,'val')+field('Sábados, domingos y festivos de retén','retenHoliday',v.retenHoliday,'val')+'</div><p class="small">Días de retén registrados. Pendiente de confirmar las tarifas para incluirlos en el cálculo económico.</p></div>':'')+
+(v.reten?'<div class="reveal"><div class="habitual-grid">'+field('Retén semanal · 28,60 €/día','retenNormal',v.retenNormal,'val')+field('Retén fin de semana o festivo · 71,51 €/día','retenHoliday',v.retenHoliday,'val')+'</div><p class="small">Retén incluido en el cálculo económico según la tabla ACSA.</p></div>':'')+
 check('Cobro la prima de recarga','premium',v.premium)+
 check('He comprado 5 días de descanso','week',v.week)+
 (v.week?'<div class="reveal"><div class="statusline"><span>Días libres adicionales</span><b>5 días</b></div><div class="statusline"><span>Descuento de la prima</span><b>−'+curr(parse(p.weekRate))+'</b></div>'+(v.premium?'':'<div class="error">Para comprar los cinco días debe estar activada la prima de recarga.</div>')+'</div>':'')+
@@ -220,7 +224,7 @@ check('Tengo algún plus adicional','other',v.other)+
 '</section>'+
 '<section class="panel totals" id="results"></section>'+
 '<details id="detail"><summary>Ver desglose completo</summary><div class="detailbody" id="details"></div></details>'+
-'<p class="offline-state" id="offline-status" role="status" aria-live="polite"></p><p class="foot">Estimación orientativa de la recarga, no una nómina oficial. El retén se registra pero todavía no se suma al cálculo económico; no incluye seguro médico. Se guarda automáticamente.</p>';
+'<p class="offline-state" id="offline-status" role="status" aria-live="polite"></p><p class="foot">Estimación orientativa de la recarga, no una nómina oficial. Incluye retén; no incluye seguro médico. Se guarda automáticamente.</p>';
 }
 function detailed(c){
 return [
@@ -234,6 +238,8 @@ return [
 ['Plus parada lunes a viernes (33,70 €/día)',c.paradaNormal],
 ['Plus parada fines de semana/festivos (74,15 €/día)',c.paradaHoliday],
 ['Prima recarga, descontada compra',c.paidPrime],
+['Retén semanal (28,60 €/día)',c.retenNormal],
+['Retén fin de semana o festivo (71,51 €/día)',c.retenHoliday],
 ['Otros complementos',c.other],
 ['Total generado bruto',c.totalGross],
 ['IRPF estimado (conceptos sujetos)',-c.irpf],
