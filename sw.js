@@ -1,13 +1,46 @@
-// Recarga Control: network-first for pages so updates appear without clearing the browser cache.
-const CACHE="recargue-v11";
-const ASSETS=["./","./index.html","./manifest.webmanifest","./convenio-acsa.html","./icons/recargue-192.png","./icons/recargue.svg"];
-self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
-self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener("fetch",e=>{
- if(e.request.method!=="GET"||new URL(e.request.url).origin!==self.location.origin)return;
- const nav=e.request.mode==="navigate";
- e.respondWith(nav?
-  fetch(e.request).then(resp=>{if(resp.ok){const copy=resp.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}return resp;}).catch(()=>caches.match(e.request).then(v=>v||caches.match("./index.html"))):
-  caches.match(e.request).then(cached=>cached||fetch(e.request).then(resp=>{if(resp.ok){const copy=resp.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}return resp;}))
- );
+// Recargué: cache-first para usar la calculadora instalada incluso en modo avión.
+const CACHE="recargue-offline-v12";
+const CORE=["./","./index.html","./manifest.webmanifest","./convenio-acsa.html","./icons/recargue-192.png","./icons/recargue.svg"];
+const SCOPE=self.registration.scope;
+const localUrl=path=>new URL(path,SCOPE).href;
+const owned=name=>name.startsWith("recargue-")||name.startsWith("recarga-control-");
+self.addEventListener("install",event=>{
+ event.waitUntil((async()=>{
+  const cache=await caches.open(CACHE);
+  await cache.addAll(CORE.map(path=>new Request(localUrl(path),{cache:"reload"})));
+  await self.skipWaiting();
+ })());
+});
+self.addEventListener("activate",event=>{
+ event.waitUntil((async()=>{
+  const keys=await caches.keys();
+  await Promise.all(keys.filter(key=>owned(key)&&key!==CACHE).map(key=>caches.delete(key)));
+  await self.clients.claim();
+ })());
+});
+self.addEventListener("fetch",event=>{
+ const request=event.request;
+ if(request.method!=="GET")return;
+ const url=new URL(request.url);
+ if(url.origin!==self.location.origin||!url.href.startsWith(SCOPE))return;
+ event.respondWith((async()=>{
+  const cache=await caches.open(CACHE);
+  const hit=await cache.match(request,{ignoreSearch:true});
+  if(hit)return hit;
+  try{
+   const response=await fetch(request);
+   // El PDF grande no se descarga al instalar; si se abre completo se guarda.
+   // No guardar respuestas parciales 206 de los lectores PDF de iOS/Android.
+   if(response.ok&&response.status===200&&!request.headers.has("range")){
+    event.waitUntil(cache.put(request,response.clone()).catch(()=>{}));
+   }
+   return response;
+  }catch(err){
+   if(request.mode==="navigate"){
+    const fallback=await cache.match(localUrl("./index.html"));
+    if(fallback)return fallback;
+   }
+   return Response.error();
+  }
+ })());
 });

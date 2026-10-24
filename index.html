@@ -70,7 +70,7 @@ summary{padding:15px 17px;cursor:pointer;font-size:13px;font-weight:700}
 .modal{max-width:420px;width:100%;background:white;border-radius:19px;padding:25px;box-shadow:0 20px 70px #14223d45}
 .modal h2{font-size:21px}.modal p{color:var(--muted);font-size:14px;line-height:1.5}
 .modal .actions{display:flex;gap:10px}.modal .actions button{flex:1}
-.backup-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}.backup-actions .secondary{font-size:13px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.backup-actions input{display:none}button.ghost{border:1px solid var(--line);border-radius:11px;padding:13px;background:#fff;color:var(--ink);font-weight:680}
+.backup-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}.backup-actions .secondary{font-size:13px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.backup-actions input{display:none}.offline-state{font-size:11px;text-align:center;color:var(--muted);margin:13px 0 0}.offline-state.ready{color:#176746}button.ghost{border:1px solid var(--line);border-radius:11px;padding:13px;background:#fff;color:var(--ink);font-weight:680}
 @media(max-width:350px){main{padding-left:12px;padding-right:12px}.panel{padding:15px}.totalrow strong{font-size:17px}.totalrow.large strong{font-size:23px}}
 </style>
 </head>
@@ -166,7 +166,7 @@ field('IRPF (%) · editable','irpf',p.irpf,'price')+
 '</div><div class="note">La media dieta y el kilometraje son referencias provinciales publicadas para 2025, no tarifas 2026 confirmadas. La prima corresponde a la referencia ACSA 2026. Los importes mostrados son fijos en esta versión.</div>'+
 '<div class="sep"></div><div class="small">Coeficientes: horas extras cobradas ×1,50 · descanso de horas compensadas ×1,75 · prima por compensar ×0,50.</div>'+
 '<button class="primary" type="button" data-action="prepare">Aceptar y continuar</button><div id="validation"></div></section>'+
-'<section class="panel"><h2>Guardar y recuperar mis datos</h2><p class="small">Guarda una copia de tus horas, tarifas y datos de recarga para no perderlos. Podrás recuperarlos en este u otro dispositivo cuando lo necesites, sin tener que introducirlos de nuevo.</p><div class="backup-actions"><button class="secondary" type="button" data-action="export">Guardar copia</button><label class="secondary" for="backup-input">Importar copia<input id="backup-input" type="file" accept=".json,application/json" hidden></label></div></section><p class="foot">Tu información se guarda en este móvil, sin cuentas ni registro.</p>';
+'<section class="panel"><h2>Guardar y recuperar mis datos</h2><p class="small">Guarda una copia de tus horas, tarifas y datos de recarga para no perderlos. Podrás recuperarlos en este u otro dispositivo cuando lo necesites, sin tener que introducirlos de nuevo.</p><div class="backup-actions"><button class="secondary" type="button" data-action="export">Guardar copia</button><label class="secondary" for="backup-input">Importar copia<input id="backup-input" type="file" accept=".json,application/json" hidden></label></div></section><p class="offline-state" id="offline-status" role="status" aria-live="polite"></p><p class="foot">Tu información se guarda en este móvil, sin cuentas ni registro.</p>';
 }
 function check(label,key,checked){
 return '<label class="checkline'+(checked?' selected':'')+'"><span class="checktext">'+label+'</span><input type="checkbox" data-flag="'+key+'" '+(checked?'checked':'')+'></label>';
@@ -204,7 +204,7 @@ check('Tengo algún plus adicional','other',v.other)+
 '</section>'+
 '<section class="panel totals" id="results"></section>'+
 '<details id="detail"><summary>Ver desglose completo</summary><div class="detailbody" id="details"></div></details>'+
-'<p class="foot">Estimación orientativa de la recarga, no una nómina oficial. No incluye retén ni seguro médico. Se guarda automáticamente.</p>';
+'<p class="offline-state" id="offline-status" role="status" aria-live="polite"></p><p class="foot">Estimación orientativa de la recarga, no una nómina oficial. No incluye retén ni seguro médico. Se guarda automáticamente.</p>';
 }
 function detailed(c){
 return [
@@ -251,9 +251,16 @@ let cp=document.getElementById("compCash");if(cp)cp.textContent=curr(c.compPremi
 let warn=document.getElementById("hoursWarn");if(warn)warn.innerHTML=c.valid?'':'<div class="error">Has compensado más horas de las extras indicadas. El cálculo usa únicamente las horas disponibles.</div>';
 if(focused){const n=document.getElementById("editable-irpf");n.focus();try{n.setSelectionRange(cursor,cursor)}catch(e){}}
 }
+let offlineReady=false,offlineFailure=false;
+function showOfflineState(){
+ const e=document.getElementById("offline-status");if(!e)return;
+ e.textContent=offlineReady?"✓ Lista para funcionar sin conexión":offlineFailure?"No se ha podido preparar el modo sin conexión. Vuelve a abrir la app con internet.":"Preparando uso sin conexión…";
+ if(offlineReady)e.classList.add("ready");else e.classList.remove("ready");
+}
 function render(){
-app.innerHTML=(screen==="calc"&&state.configured)?calculator():configScreen();
-if(screen==="calc"&&state.configured)refresh();
+ app.innerHTML=(screen==="calc"&&state.configured)?calculator():configScreen();
+ if(screen==="calc"&&state.configured)refresh();
+ showOfflineState();
 }
 function modalHTML(){
 return '<div class="modalback" id="modalback"><div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="modal-title"><h2 id="modal-title">Revisa bien tus precios</h2>'+
@@ -348,7 +355,11 @@ case "confirmPrices":
 }
 });
 render();
-if("serviceWorker" in navigator && location.protocol==="https:")navigator.serviceWorker.register("./sw.js").catch(()=>{});
+if("serviceWorker" in navigator && location.protocol==="https:"){
+ navigator.serviceWorker.register("./sw.js").then(()=>navigator.serviceWorker.ready).then(()=>{
+  offlineReady=true;offlineFailure=false;showOfflineState();
+ }).catch(()=>{offlineFailure=true;showOfflineState();});
+}else{offlineFailure=true;showOfflineState();}
 })();
 </script>
 </body>

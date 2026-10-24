@@ -74,3 +74,10 @@ Son las **tarifas publicadas para 2025 del convenio del metal de Tarragona**, ut
 - **Tick «No cobro complemento nuclear»:** mantiene los mismos días en ambos campos, pero fija únicamente el importe del complemento nuclear en cero. Ambos recuadros siguen permitiendo editar los días.
 - Ambos conceptos se consideran salario habitual y entran en **el valor total bruto y neto estimado**, con sus deducciones aproximadas.
 - Si la tarifa de hora normal configurada por cada trabajador ya engloba estos pluses, no conviene duplicarlos en el valor total.
+
+## Funcionamiento sin internet
+- Abre Recargué con internet en Safari o Chrome y añádela a la pantalla de inicio. Abre la aplicación instalada **al menos una vez con internet** para preparar la caché propia de la instalación.
+- Cuando aparezca **«Lista para funcionar sin conexión»**, la calculadora, los datos y los resultados se pueden usar en modo avión. Los cambios se guardan en localStorage, en el dispositivo.
+- La aplicación prioriza la caché: no necesita acceder a Netlify para cada cálculo ni cada visita. Cuando haya internet, el navegador puede comprobar si existe una versión nueva del service worker y actualizarla.
+- **Excepciones:** «Ver convenio TGN» es un sitio web externo y necesita internet. El PDF ACSA (12,5 MB) no se descarga automáticamente, para no agotar datos móviles y créditos; puede descargarse a Archivos para usarlo sin conexión, o quedar guardado tras una descarga completa.
+- iOS y Android pueden eliminar cachés en situaciones de poco almacenamiento. Para registros importantes usa **Guardar copia**.
