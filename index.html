@@ -72,6 +72,7 @@ summary{padding:15px 17px;cursor:pointer;font-size:13px;font-weight:700}
 .modal .actions{display:flex;gap:10px}.modal .actions button{flex:1}
 .backup-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}.backup-actions .secondary{font-size:13px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.backup-actions input{display:none}.offline-state{font-size:11px;text-align:center;color:var(--muted);margin:13px 0 0}.offline-state.ready{color:#176746}button.ghost{border:1px solid var(--line);border-radius:11px;padding:13px;background:#fff;color:var(--ink);font-weight:680}
 @media(max-width:350px){main{padding-left:12px;padding-right:12px}.panel{padding:15px}.totalrow strong{font-size:17px}.totalrow.large strong{font-size:23px}}
+.install-overlay{position:fixed;inset:0;background:#12263b99;display:flex;align-items:center;justify-content:center;padding:20px;z-index:1000}.install-dialog{background:white;border-radius:20px;padding:25px;max-width:390px;width:100%;box-shadow:0 20px 70px #0b244050;text-align:center}.install-dialog img{width:64px;height:64px;border-radius:15px}.install-dialog h2{margin:12px 0 8px;font-size:21px}.install-dialog p{font-size:14px;line-height:1.55;color:#566579}.install-dialog .secondary{margin-top:10px;width:100%;min-height:45px}.install-dialog .primary{margin-top:14px}
 </style>
 </head>
 <body>
@@ -355,6 +356,31 @@ case "confirmPrices":
 }
 });
 render();
+let deferredInstallPrompt=null;
+const isInstalled=()=>window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+const isMobile=()=>/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+const installDismissKey="recargue-install-dismissed";
+function installPopup(){
+ if(!isMobile()||isInstalled()||sessionStorage.getItem(installDismissKey)||document.getElementById("install-popup"))return;
+ const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+ const guide=ios?'<p>En Safari, pulsa <b>Compartir</b> y después <b>Añadir a pantalla de inicio</b>. Si estás en otro navegador, abre el enlace en Safari.</p>':'<p>Instala la aplicación para abrirla desde la pantalla de inicio y utilizarla sin conexión.</p>';
+ const button=ios?'<button class="primary" type="button" data-install="instructions">Entendido</button>':'<button class="primary" type="button" data-install="install">Instalar Recargué</button>';
+ document.body.insertAdjacentHTML("beforeend",'<div class="install-overlay" id="install-popup"><div class="install-dialog" role="dialog" aria-modal="true" aria-label="Instalar Recargué"><img src="./icons/recargue-192.png" alt=""><h2>Instala Recargué</h2>'+guide+button+'<button class="secondary" type="button" data-install="dismiss">Ahora no</button></div></div>');
+}
+document.addEventListener("click",async ev=>{
+ const action=ev.target.closest("[data-install]")?.dataset.install;if(!action)return;
+ if(action==="install"&&deferredInstallPrompt){
+  const prompt=deferredInstallPrompt;deferredInstallPrompt=null;
+  prompt.prompt();await prompt.userChoice.catch(()=>{});
+ }else if(action==="install"){
+  alert("Abre el menú del navegador y selecciona «Instalar aplicación» o «Añadir a pantalla de inicio».");
+ }
+ sessionStorage.setItem(installDismissKey,"1");
+ document.getElementById("install-popup")?.remove();
+});
+window.addEventListener("beforeinstallprompt",ev=>{ev.preventDefault();deferredInstallPrompt=ev;});
+window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;document.getElementById("install-popup")?.remove();});
+if(isMobile()&&!isInstalled())setTimeout(installPopup,1100);
 if("serviceWorker" in navigator && location.protocol==="https:"){
  navigator.serviceWorker.register("./sw.js").then(()=>navigator.serviceWorker.ready).then(()=>{
   offlineReady=true;offlineFailure=false;showOfflineState();
