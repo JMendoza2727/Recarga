@@ -1,5 +1,5 @@
 // Recargué: cache-first para usar la calculadora instalada incluso en modo avión.
-const CACHE="recargue-offline-v12";
+const CACHE="recargue-offline-v13";
 const CORE=["./","./index.html","./manifest.webmanifest","./convenio-acsa.html","./icons/recargue-192.png","./icons/recargue.svg"];
 const SCOPE=self.registration.scope;
 const localUrl=path=>new URL(path,SCOPE).href;
@@ -26,7 +26,10 @@ self.addEventListener("fetch",event=>{
  event.respondWith((async()=>{
   const cache=await caches.open(CACHE);
   const hit=await cache.match(request,{ignoreSearch:true});
-  if(hit)return hit;
+  if(hit){
+   if(request.mode==="navigate")event.waitUntil(self.registration.update().catch(()=>{}));
+   return hit;
+  }
   try{
    const response=await fetch(request);
    // El PDF grande no se descarga al instalar; si se abre completo se guarda.
