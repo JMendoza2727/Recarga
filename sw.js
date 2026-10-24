@@ -1,5 +1,5 @@
 // Recargué: network-first para documentos; offline con última copia válida.
-const CACHE="recargue-offline-v20";
+const CACHE="recargue-offline-v21";
 const CORE=["./index.html","./manifest.webmanifest","./icons/recargue-192.png","./icons/recargue.svg"];
 const SCOPE=self.registration.scope;
 const localUrl=path=>new URL(path,SCOPE).href;
