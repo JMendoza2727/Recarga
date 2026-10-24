@@ -3,10 +3,12 @@
 Calculadora sencilla para **toda la recarga**, aunque ocupe octubre, noviembre y diciembre. Se instala en iPhone o Android sin necesidad de publicar en las tiendas.
 
 ## Cómo funciona
-1. **Primera vez:** nombre opcional, introduce tus precios de **hora normal** y **hora extra**. La media dieta (23,83 €), el kilometraje (0,47 €/km) y la prima de recarga (625,46 €) aparecen como valores fijos no editables. El coste de compra de cinco días no aparece en Configuración (se descuenta automáticamente 300 € al activarlo). Se muestra un aviso para verificar los precios antes de continuar.
-2. **Calculadora única:** escribe el total de horas normales, horas extras, medias dietas y kilómetros de **toda la recarga**.
-3. Marca solo lo que corresponda: **compensar horas extraordinarias**, **prima de recarga**, **comprar cinco días de descanso** y **otros pluses**.
-4. La aplicación calcula el **valor total generado bruto**, el **dinero adicional bruto** sin duplicar horas normales ya abonadas y el **dinero adicional neto estimado** (IRPF siempre editable). También muestra los días libres acumulados.
+1. **Primera vez:** nombre opcional, horas normales y extraordinarias a precio personal, y precios de convenio precargados.
+2. **Calculadora:** total de horas normales, horas extras, dietas, kilómetros, días de parada, P.T.P. y nuclear, y opciones de compensación, prima y compra de descanso.
+3. **Resultado:** se muestra exclusivamente el **valor total generado bruto y neto estimado**, incluyendo horas normales y los complementos habituales (P.T.P. y nuclear). No se muestra un subtotal "extra" separado.
+4. **Deducciones estimadas:** IRPF editable sobre importes salariales, cotización orientativa de horas extras (4,70 %) y del resto del salario (6,50 %); dietas y km exentos solo si cumplen los requisitos.
+
+**Importante:** el total de la recarga no es dinero adicional a las nóminas que ya pagan el salario y complementos habituales. Evita duplicar P.T.P. y nuclear si están incluidos en el precio introducido como hora normal.
 
 ### Tarifas precargadas
 - **Hora normal y hora extra:** vacías y obligatorias, cada persona introduce las suyas.
@@ -18,7 +20,7 @@ Calculadora sencilla para **toda la recarga**, aunque ocupe octubre, noviembre y
 - **Dietas/kilometraje:** se consideran exentos en el cálculo simplificado solo si cumplen sus requisitos. Si están sujetos o hay otros conceptos, puede cambiar el neto real.
 
 ## No incluye
-No solicita meses/días, ni gestiona retén, ni seguros médicos, ni calcula las nóminas habituales. Las horas normales solo figuran en el **valor total generado**; ya están cobradas en las nóminas ordinarias y por eso no cuentan en el **dinero extra**.
+No solicita meses/días, ni gestiona retén, ni seguros médicos, ni calcula las nóminas habituales. Las horas normales figuran en los dos totales (bruto y neto), pero normalmente ya se cobran en las nóminas ordinarias.
 
 ## Instalación de GitHub Pages
 En GitHub abre **Settings → Pages** y elige **Deploy from a branch → main → /(root)**. 
@@ -69,5 +71,5 @@ Son las **tarifas publicadas para 2025 del convenio del metal de Tarragona**, ut
 - **Días con P.T.P.:** 9,58 €/día, según nómina de referencia ACSA.
 - **Días con complemento nuclear:** 6,61 €/día, según nómina de referencia ACSA.
 - **Tick «No cobro complemento nuclear»:** desactiva el número de días nucleares y fija su valor calculado en cero sin eliminar lo que se hubiera escrito.
-- Ambos conceptos se consideran salario habitual: se incorporan al **valor total bruto** y al desglose, pero **no se vuelven a añadir al dinero extra bruto ni neto** para evitar doble contabilización.
+- Ambos conceptos se consideran salario habitual y entran en **el valor total bruto y neto estimado**, con sus deducciones aproximadas.
 - Si la tarifa de hora normal configurada por cada trabajador ya engloba estos pluses, no conviene duplicarlos en el valor total.
