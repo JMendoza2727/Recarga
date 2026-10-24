@@ -1,6 +1,6 @@
 // Recargué: network-first para documentos; offline con última copia válida.
-const CACHE="recargue-offline-v23";
-const CORE=["./index.html","./manifest.webmanifest","./icons/recargue-192.png","./icons/recargue.svg"];
+const CACHE="recargue-offline-v24";
+const CORE=["./","./manifest.webmanifest","./icons/recargue-192.png","./icons/recargue.svg"];
 const SCOPE=self.registration.scope;
 const localUrl=path=>new URL(path,SCOPE).href;
 const owned=name=>name.startsWith("recargue-")||name.startsWith("recarga-control-");
@@ -8,7 +8,11 @@ const cacheable=response=>response&&response.ok&&response.status===200&&!respons
 self.addEventListener("install",event=>{
  event.waitUntil((async()=>{
   const cache=await caches.open(CACHE);
-  await cache.addAll(CORE.map(path=>new Request(localUrl(path),{cache:"reload",redirect:"error"})));
+  await Promise.allSettled(CORE.map(async path=>{
+   const url=localUrl(path);
+   const response=await fetch(url,{cache:"reload"});
+   if(cacheable(response))await cache.put(url,response);
+  }));
   await self.skipWaiting();
  })());
 });
@@ -34,14 +38,14 @@ self.addEventListener("fetch",event=>{
    const cached=await cache.match(request,{ignoreSearch:true});
    if(cached&&!cached.redirected)return cached;
    if(navigation){
-    const home=await cache.match(localUrl("./index.html"));
+    const home=await cache.match(localUrl("./"));
     if(home&&!home.redirected)return home;
    }
    return Response.error();
   };
   // Con conexión priorizar siempre el servidor, sin devolver HTML obsoleto.
   try{
-   const response=await fetch(request,{cache:"no-store",redirect:"error"});
+   const response=await fetch(request,{cache:"no-store"});
    if(cacheable(response)){
     event.waitUntil(cache.put(request,response.clone()).catch(()=>{}));
     return response;
