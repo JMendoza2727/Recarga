@@ -394,6 +394,19 @@ document.addEventListener("click",async ev=>{
 window.addEventListener("beforeinstallprompt",ev=>{ev.preventDefault();deferredInstallPrompt=ev;});
 window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;document.getElementById("install-popup")?.remove();});
 if(isMobile()&&!isInstalled())setTimeout(installPopup,1100);
+
+// Recarga la interfaz cuando una nueva versión del Service Worker toma el control.
+// Evita recargas infinitas y no modifica los datos locales.
+let refreshedForUpdate=false;
+navigator.serviceWorker.addEventListener("controllerchange",()=>{
+ if(!refreshedForUpdate&&navigator.onLine){
+  refreshedForUpdate=true;
+  location.reload();
+ }
+});
+window.addEventListener("online",()=>{
+ navigator.serviceWorker.getRegistration().then(reg=>reg?.update()).catch(()=>{});
+});
 if("serviceWorker" in navigator && location.protocol==="https:"){
  navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).then(async reg=>{if(navigator.onLine)await reg.update().catch(()=>{});return navigator.serviceWorker.ready;}).then(()=>{
   offlineReady=true;offlineFailure=false;showOfflineState();
