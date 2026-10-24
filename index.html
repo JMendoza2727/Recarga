@@ -82,7 +82,8 @@ summary{padding:15px 17px;cursor:pointer;font-size:13px;font-weight:700}
 const KEY="recarga-control-simple-v3";
 const LOCKED=Object.freeze({dietRate:"19.50",kmRate:"0.47",premiumRate:"625.46",weekRate:"300"});
 const DEFAULT={name:"",normalRate:"",extraRate:"",...LOCKED,irpf:"23"};
-const EMPTY={normal:"",extra:"",diets:"",km:"",comp:false,compHours:"",premium:false,week:false,other:false,otherAmount:""};
+const PARADA=Object.freeze({normalDay:33.70,holidayDay:74.15}); // Tarifas del convenio provincial de Tarragona 2025; pendientes de publicación de tablas 2026.
+const EMPTY={normal:"",extra:"",diets:"",km:"",paradaNormal:"",paradaHoliday:"",comp:false,compHours:"",premium:false,week:false,other:false,otherAmount:""};
 let state={configured:false,prices:{...DEFAULT},values:{...EMPTY}},screen="start",modal="";
 try{
  const prior=JSON.parse(localStorage.getItem(KEY)||"null");
@@ -107,17 +108,20 @@ function cash(){
  const paidExtra=paidH*parse(p.extraRate)*1.5;
  const compPremium=restH*parse(p.extraRate)*.5;
  const travel=parse(v.diets)*parse(p.dietRate)+parse(v.km)*parse(p.kmRate);
+ const paradaNormal=parse(v.paradaNormal)*PARADA.normalDay;
+ const paradaHoliday=parse(v.paradaHoliday)*PARADA.holidayDay;
+ const paradaTotal=paradaNormal+paradaHoliday;
  const paidPrime=v.premium?Math.max(0,parse(p.premiumRate)-(v.week?parse(p.weekRate):0)):0;
  const other=v.other?parse(v.otherAmount):0;
- const extraGross=paidExtra+compPremium+travel+paidPrime+other;
+ const extraGross=paidExtra+compPremium+travel+paradaTotal+paidPrime+other;
  const totalGross=hourlyNormal+extraGross;
- const taxable=paidExtra+compPremium+paidPrime+other;
+ const taxable=paidExtra+compPremium+paradaTotal+paidPrime+other;
  const irpf=taxable*parse(p.irpf)/100;
  const ssExtra=paidExtra*.047;
- const ssCommon=(compPremium+paidPrime+other)*.065;
+ const ssCommon=(compPremium+paradaTotal+paidPrime+other)*.065;
  const ss=ssExtra+ssCommon;
  const extraNet=extraGross-irpf-ss;
- return {hNormal,hExtra,requested,valid,restH,paidH,hourlyNormal,paidExtra,compPremium,travel,paidPrime,other,extraGross,totalGross,taxable,irpf,ssExtra,ssCommon,ss,extraNet,days:restH*1.75/8+(v.week&&v.premium?5:0),compDays:restH*1.75/8};
+ return {hNormal,hExtra,requested,valid,restH,paidH,hourlyNormal,paidExtra,compPremium,travel,paradaNormal,paradaHoliday,paradaTotal,paidPrime,other,extraGross,totalGross,taxable,irpf,ssExtra,ssCommon,ss,extraNet,days:restH*1.75/8+(v.week&&v.premium?5:0),compDays:restH*1.75/8};
 }
 function field(label,key,value,target,opts={}){
  const type=opts.text?"text":"number",placeholder=opts.placeholder||"0",step=type==="number"?'step="any" min="0" inputmode="decimal"':"",required=opts.required?' aria-required="true"':"";
@@ -160,7 +164,10 @@ return header(false)+'<h1>'+(p.name?'Recarga de '+escapeHTML(p.name):'Calculador
 '<section class="panel"><h2>Horas y desplazamientos</h2><div class="grid">'+
 field('Horas normales','normal',v.normal,'val')+field('Horas extras','extra',v.extra,'val')+
 field('Medias dietas','diets',v.diets,'val')+field('Kilómetros','km',v.km,'val')+
-'</div></section>'+
+'</div><div class="sep"></div><h2>Plus de parada · días trabajados</h2><div class="grid">'+
+field('Días normales · 33,70 €/día','paradaNormal',v.paradaNormal,'val')+
+field('Sáb./dom./fest. · 74,15 €/día','paradaHoliday',v.paradaHoliday,'val')+
+'</div><p class="small" style="margin:13px 0 0">Tarifas de referencia de Tarragona 2025, pendientes de actualización oficial para 2026. Cuenta los días trabajados, no los días de descanso.</p></section>'+
 '<section class="panel"><h2>Complementos y descansos</h2>'+
 check('He compensado horas extras','comp',v.comp)+
 (v.comp?'<div class="reveal">'+field('Horas extras que compensas','compHours',v.compHours,'val',{placeholder:'Ej. 11'})+
@@ -183,6 +190,8 @@ return [
 ['Horas extras cobradas (×1,5)',c.paidExtra],
 ['Prima de horas compensadas (×0,5)',c.compPremium],
 ['Dietas y kilometraje',c.travel],
+['Plus parada lunes a viernes (33,70 €/día)',c.paradaNormal],
+['Plus parada fines de semana/festivos (74,15 €/día)',c.paradaHoliday],
 ['Prima recarga, descontada compra',c.paidPrime],
 ['Otros complementos',c.other],
 ['Valor total generado',c.totalGross],
@@ -192,7 +201,7 @@ return [
 ['Cotización ordinaria de otros pluses (6,50 %)',-c.ssCommon],
 ['Dinero extra neto estimado',c.extraNet]
 ].map(([n,v])=>'<div class="detailrow"><span>'+n+'</span><span>'+curr(v)+'</span></div>').join('')+
-'<div class="note">Las horas normales se muestran únicamente en el valor total: ya se abonan en las nóminas habituales. Las dietas y el kilometraje se consideran exentos en esta simulación si cumplen los requisitos legales; de otro modo el neto real será menor. La cotización exacta también depende de la distribución entre nóminas y sus bases.</div>';
+'<div class="note">Las horas normales se muestran únicamente en el valor total: ya se abonan en las nóminas habituales. Las dietas y el kilometraje se consideran exentos en esta simulación si cumplen los requisitos legales; de otro modo el neto real será menor. Los pluses de parada sí se incluyen como salario sujeto a IRPF y a cotización estimada. Los importes diarios de parada son referencias de 2025 pendientes de las tablas oficiales 2026. La cotización exacta también depende de la distribución entre nóminas y sus bases.</div>';
 }
 function resultHTML(c){
 return '<h2>Resultado de la recarga</h2>'+
