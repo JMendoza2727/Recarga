@@ -1,5 +1,5 @@
 // Recargué: cache-first para usar la calculadora instalada incluso en modo avión.
-const CACHE="recargue-offline-v15";
+const CACHE="recargue-offline-v16";
 const CORE=["./","./index.html","./manifest.webmanifest","./convenio-acsa.html","./icons/recargue-192.png","./icons/recargue.svg"];
 const SCOPE=self.registration.scope;
 const localUrl=path=>new URL(path,SCOPE).href;
@@ -27,7 +27,7 @@ self.addEventListener("fetch",event=>{
   const cache=await caches.open(CACHE);
   const hit=await cache.match(request,{ignoreSearch:true});
   if(hit){
-   if(request.mode==="navigate")event.waitUntil(self.registration.update().catch(()=>{}));
+   if(request.mode==="navigate" && self.navigator?.onLine!==false)event.waitUntil(self.registration.update().catch(()=>{}));
    return hit;
   }
   try{

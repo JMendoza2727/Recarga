@@ -189,7 +189,7 @@ field('Sáb./dom./fest. · 74,15 €/día','paradaHoliday',v.paradaHoliday,'val'
 '</div><p class="small" style="margin:13px 0 0">Tarifas de referencia de Tarragona 2025, pendientes de actualización oficial para 2026. Cuenta los días trabajados, no los días de descanso.</p>'+
 '<div class="sep"></div><h2>Complementos de nómina habitual</h2><div class="grid">'+
 field('Días con P.T.P. · 9,58 €/día','ptpDays',v.ptpDays,'val')+
-field('Días con plus nuclear · 6,61 €/día','nuclearDays',v.nuclearDays,'val')+
+field('Días con complemento nuclear · 6,61 €/día','nuclearDays',v.nuclearDays,'val')+
 field('Días con plus turno · 3,53 €/día','turnDays',v.ptpDays,'val')+
 '</div>'+
 check('No cobro complemento nuclear','noNuclear',v.noNuclear)+
@@ -387,7 +387,7 @@ window.addEventListener("beforeinstallprompt",ev=>{ev.preventDefault();deferredI
 window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;document.getElementById("install-popup")?.remove();});
 if(isMobile()&&!isInstalled())setTimeout(installPopup,1100);
 if("serviceWorker" in navigator && location.protocol==="https:"){
- navigator.serviceWorker.register("./sw.js").then(()=>navigator.serviceWorker.ready).then(()=>{
+ navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).then(async reg=>{if(navigator.onLine)await reg.update().catch(()=>{});return navigator.serviceWorker.ready;}).then(()=>{
   offlineReady=true;offlineFailure=false;showOfflineState();
  }).catch(()=>{offlineFailure=true;showOfflineState();});
 }else{offlineFailure=true;showOfflineState();}
