@@ -85,13 +85,23 @@ const DEFAULT={name:"",normalRate:"",extraRate:"",...LOCKED,irpf:"23"};
 const PARADA=Object.freeze({normalDay:33.70,holidayDay:74.15}); // Tarifas del convenio provincial de Tarragona 2025; pendientes de publicación de tablas 2026.
 const ORDINARY=Object.freeze({ptpDay:9.58,nuclearDay:6.61}); // Importes diarios de referencia de nómina ACSA.
 const EMPTY={normal:"",extra:"",diets:"",km:"",paradaNormal:"",paradaHoliday:"",ptpDays:"",nuclearDays:"",noNuclear:false,comp:false,compHours:"",premium:false,week:false,other:false,otherAmount:""};
+// Un mismo día trabajado da lugar a ambos complementos cuando se perciben.
+// Se conservan ambas claves de almacenamiento para que funcionen las copias antiguas.
+function syncHabitualDays(v){
+ const ptp=String(v.ptpDays??"");
+ const nuclear=String(v.nuclearDays??"");
+ const shared=ptp!==""?ptp:nuclear;
+ v.ptpDays=shared;
+ v.nuclearDays=shared;
+ return v;
+}
 let state={configured:false,prices:{...DEFAULT},values:{...EMPTY}},screen="start",modal="";
 try{
  const prior=JSON.parse(localStorage.getItem(KEY)||"null");
  if(prior&&typeof prior==="object"){
   state.configured=prior.configured===true;
   state.prices={...DEFAULT,...(prior.prices||{}),...LOCKED};
-  state.values={...EMPTY,...(prior.values||{})};
+  state.values=syncHabitualDays({...EMPTY,...(prior.values||{})});
  }
 }catch(e){}
 if(state.configured) screen="calc";
@@ -176,10 +186,10 @@ field('Sáb./dom./fest. · 74,15 €/día','paradaHoliday',v.paradaHoliday,'val'
 '</div><p class="small" style="margin:13px 0 0">Tarifas de referencia de Tarragona 2025, pendientes de actualización oficial para 2026. Cuenta los días trabajados, no los días de descanso.</p>'+
 '<div class="sep"></div><h2>Complementos de nómina habitual</h2><div class="grid">'+
 field('Días con P.T.P. · 9,58 €/día','ptpDays',v.ptpDays,'val')+
-field('Días con plus nuclear · 6,61 €/día','nuclearDays',v.nuclearDays,'val',{disabled:v.noNuclear})+
+field('Días con plus nuclear · 6,61 €/día','nuclearDays',v.nuclearDays,'val')+
 '</div>'+
 check('No cobro complemento nuclear','noNuclear',v.noNuclear)+
-'<p class="small" style="margin:10px 0 0">El P.T.P. y el complemento nuclear se añaden al valor total, pero no al dinero extra: normalmente ya se cobran en la nómina habitual. Si tu precio de hora normal ya los incluye, evita contarlos dos veces.</p></section>'+
+'<p class="small" style="margin:10px 0 0">Los dos campos comparten los mismos días: al cambiar uno se actualiza el otro. Si no cobras complemento nuclear, marca el tick: se mantienen los días, pero se calcula 0 € de nuclear. Ambos conceptos se incluyen en el bruto y neto total estimados; comprueba que la tarifa normal no los lleve ya incluidos.</p></section>'+
 '<section class="panel"><h2>Complementos y descansos</h2>'+
 check('He compensado horas extras','comp',v.comp)+
 (v.comp?'<div class="reveal">'+field('Horas extras que compensas','compHours',v.compHours,'val',{placeholder:'Ej. 11'})+
@@ -275,7 +285,19 @@ if(el.dataset.price){
  }
  return;
 }
-if(el.dataset.val){state.values[el.dataset.val]=el.value;save();refresh()}
+if(el.dataset.val){
+ const key=el.dataset.val;
+ if(key==="ptpDays"||key==="nuclearDays"){
+  // Permite escribir en cualquiera de los campos sin perder el foco del teclado.
+  state.values.ptpDays=el.value;
+  state.values.nuclearDays=el.value;
+  const twin=app.querySelector('input[data-val="'+(key==="ptpDays"?"nuclearDays":"ptpDays")+'"]');
+  if(twin)twin.value=el.value;
+ }else{
+  state.values[key]=el.value;
+ }
+ save();refresh();
+}
 });
 app.addEventListener("change",ev=>{
 const el=ev.target;
@@ -285,7 +307,7 @@ if(el.id==="backup-input"){
   const parsed=JSON.parse(content);
   if(!parsed||typeof parsed!=="object"||!parsed.prices||!parsed.values)throw Error("No es una copia de Recargué");
   if(!confirm("¿Importar esta copia? Reemplazará los datos guardados en este dispositivo."))return;
-  state={configured:parsed.configured===true,prices:{...DEFAULT,...parsed.prices,...LOCKED},values:{...EMPTY,...parsed.values}};
+  state={configured:parsed.configured===true,prices:{...DEFAULT,...parsed.prices,...LOCKED},values:syncHabitualDays({...EMPTY,...parsed.values})};
   if(!state.prices.normalRate||!state.prices.extraRate)state.configured=false;
   screen=state.configured?"calc":"start";save();render();scrollTo(0,0);
  }).catch(()=>alert("No se ha podido leer la copia. Elige un archivo JSON exportado desde Recargué."));
