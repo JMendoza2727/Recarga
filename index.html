@@ -84,8 +84,8 @@ const KEY="recarga-control-simple-v3";
 const LOCKED=Object.freeze({dietRate:"23.83",kmRate:"0.47",premiumRate:"625.46",weekRate:"300"});
 const DEFAULT={name:"",normalRate:"",extraRate:"",...LOCKED,irpf:"23"};
 const PARADA=Object.freeze({normalDay:33.70,holidayDay:74.15}); // Tarifas del convenio provincial de Tarragona 2025; pendientes de publicación de tablas 2026.
-const ORDINARY=Object.freeze({ptpDay:9.58,nuclearDay:6.61}); // Importes diarios de referencia de nómina ACSA.
-const EMPTY={normal:"",extra:"",diets:"",km:"",paradaNormal:"",paradaHoliday:"",ptpDays:"",nuclearDays:"",noNuclear:false,comp:false,compHours:"",premium:false,week:false,other:false,otherAmount:""};
+const ORDINARY=Object.freeze({ptpDay:9.58,nuclearDay:6.61,turnDay:3.53}); // Importes diarios de referencia de nómina ACSA.
+const EMPTY={normal:"",extra:"",diets:"",km:"",paradaNormal:"",paradaHoliday:"",ptpDays:"",nuclearDays:"",noNuclear:false,noTurn:false,comp:false,compHours:"",premium:false,week:false,other:false,otherAmount:""};
 // Un mismo día trabajado da lugar a ambos complementos cuando se perciben.
 // Se conservan ambas claves de almacenamiento para que funcionen las copias antiguas.
 function syncHabitualDays(v){
@@ -94,6 +94,7 @@ function syncHabitualDays(v){
  const shared=ptp!==""?ptp:nuclear;
  v.ptpDays=shared;
  v.nuclearDays=shared;
+ v.turnDays=shared;
  return v;
 }
 let state={configured:false,prices:{...DEFAULT},values:{...EMPTY}},screen="start",modal="";
@@ -119,7 +120,8 @@ function cash(){
  const hourlyNormal=hNormal*parse(p.normalRate);
  const ptpPay=parse(v.ptpDays)*ORDINARY.ptpDay;
  const nuclearPay=v.noNuclear?0:parse(v.nuclearDays)*ORDINARY.nuclearDay;
- const habitualPay=ptpPay+nuclearPay;
+ const turnPay=v.noTurn?0:parse(v.ptpDays)*ORDINARY.turnDay;
+ const habitualPay=ptpPay+nuclearPay+turnPay;
  const paidExtra=paidH*parse(p.extraRate)*1.5;
  const compPremium=restH*parse(p.extraRate)*.5;
  const travel=parse(v.diets)*parse(p.dietRate)+parse(v.km)*parse(p.kmRate);
@@ -138,7 +140,7 @@ function cash(){
  const ssCommon=(hourlyNormal+habitualPay+compPremium+paradaTotal+paidPrime+other)*.065;
  const ss=ssExtra+ssCommon;
  const totalNet=totalGross-irpf-ss;
- return {hNormal,hExtra,requested,valid,restH,paidH,hourlyNormal,ptpPay,nuclearPay,habitualPay,paidExtra,compPremium,travel,paradaNormal,paradaHoliday,paradaTotal,paidPrime,other,complementsGross,totalGross,taxable,irpf,ssExtra,ssCommon,ss,totalNet,days:restH*1.75/8+(v.week&&v.premium?5:0),compDays:restH*1.75/8};
+ return {hNormal,hExtra,requested,valid,restH,paidH,hourlyNormal,ptpPay,nuclearPay,turnPay,habitualPay,paidExtra,compPremium,travel,paradaNormal,paradaHoliday,paradaTotal,paidPrime,other,complementsGross,totalGross,taxable,irpf,ssExtra,ssCommon,ss,totalNet,days:restH*1.75/8+(v.week&&v.premium?5:0),compDays:restH*1.75/8};
 }
 function field(label,key,value,target,opts={}){
  const type=opts.text?"text":"number",placeholder=opts.placeholder||"0",step=type==="number"?'step="any" min="0" inputmode="decimal"':"",required=opts.required?' aria-required="true"':"",disabled=opts.disabled?' disabled aria-disabled="true"':"";
@@ -188,9 +190,11 @@ field('Sáb./dom./fest. · 74,15 €/día','paradaHoliday',v.paradaHoliday,'val'
 '<div class="sep"></div><h2>Complementos de nómina habitual</h2><div class="grid">'+
 field('Días con P.T.P. · 9,58 €/día','ptpDays',v.ptpDays,'val')+
 field('Días con plus nuclear · 6,61 €/día','nuclearDays',v.nuclearDays,'val')+
+field('Días con plus turno · 3,53 €/día','turnDays',v.ptpDays,'val')+
 '</div>'+
 check('No cobro complemento nuclear','noNuclear',v.noNuclear)+
-'<p class="small" style="margin:10px 0 0">Los dos campos comparten los mismos días: al cambiar uno se actualiza el otro. Si no cobras complemento nuclear, marca el tick: se mantienen los días, pero se calcula 0 € de nuclear. Ambos conceptos se incluyen en el bruto y neto total estimados; comprueba que la tarifa normal no los lleve ya incluidos.</p></section>'+
+check('No cobro plus turno','noTurn',v.noTurn)+
+'<p class="small" style="margin:10px 0 0">Los tres campos comparten los mismos días: al cambiar cualquiera se actualizan los demás. Los ticks de nuclear y turno ponen solo su importe a 0 €, sin modificar los días. Los tres conceptos se incluyen en el bruto y neto total estimados; comprueba que la tarifa normal no los lleve ya incluidos.</p></section>'+
 '<section class="panel"><h2>Complementos y descansos</h2>'+
 check('He compensado horas extras','comp',v.comp)+
 (v.comp?'<div class="reveal">'+field('Horas extras que compensas','compHours',v.compHours,'val',{placeholder:'Ej. 11'})+
@@ -212,6 +216,7 @@ return [
 ['Horas normales',c.hourlyNormal],
 ['P.T.P. habitual (9,58 €/día)',c.ptpPay],
 ['Complemento nuclear habitual (6,61 €/día)',c.nuclearPay],
+['Plus trabajo a turnos (3,53 €/día)',c.turnPay],
 ['Horas extras cobradas (×1,5)',c.paidExtra],
 ['Prima de horas compensadas (×0,5)',c.compPremium],
 ['Dietas y kilometraje',c.travel],
@@ -225,12 +230,12 @@ return [
 ['Seguridad Social resto salario (6,50 %)',-c.ssCommon],
 ['Total generado neto estimado',c.totalNet]
 ].map(([n,v])=>'<div class="detailrow"><span>'+n+'</span><span>'+curr(v)+'</span></div>').join('')+
-'<div class="note">Este resumen incluye todo lo introducido: horas normales, P.T.P., complemento nuclear, extras, pluses y primas. Las horas normales y los complementos habituales ya pueden figurar en las nóminas ordinarias; el neto total NO representa dinero adicional que cobrarás aparte. Las dietas y los kilómetros se consideran exentos solo cuando cumplan los requisitos legales. El cálculo real depende de las nóminas, bases de cotización y situación fiscal de cada trabajador.</div>';
+'<div class="note">Este resumen incluye todo lo introducido: horas normales, P.T.P., complemento nuclear, plus de turno, extras, pluses y primas. Las horas normales y los complementos habituales ya pueden figurar en las nóminas ordinarias; el neto total NO representa dinero adicional que cobrarás aparte. Las dietas y los kilómetros se consideran exentos solo cuando cumplan los requisitos legales. El cálculo real depende de las nóminas, bases de cotización y situación fiscal de cada trabajador.</div>';
 }
 function resultHTML(c){
 return '<h2>Resultado de la recarga</h2>'+
 '<div class="totalrow"><span>Valor total generado (bruto)</span><strong>'+curr(c.totalGross)+'</strong></div>'+
-'<div class="explain">Incluye horas normales, horas extras, P.T.P., complemento nuclear, pluses, dietas y primas. Es el valor de toda la recarga, no dinero adicional a tus nóminas habituales. Comprueba que tu tarifa normal no incluya ya P.T.P. o nuclear para evitar duplicidades.</div>'+
+'<div class="explain">Incluye horas normales, horas extras, P.T.P., complemento nuclear, plus de turno, pluses, dietas y primas. Es el valor de toda la recarga, no dinero adicional a tus nóminas habituales. Comprueba que tu tarifa normal no incluya ya P.T.P. o nuclear para evitar duplicidades.</div>'+
 '<div class="irpf"><label for="editable-irpf">IRPF (%) · editable siempre</label><input id="editable-irpf" type="number" inputmode="decimal" step="any" min="0" max="100" data-price="irpf" value="'+escapeHTML(state.prices.irpf)+'"></div>'+
 '<div class="inlinerow"><span>IRPF estimado</span><span class="value">−'+curr(c.irpf)+'</span></div>'+
 '<div class="inlinerow"><span>Seguridad Social estimada</span><span class="value">−'+curr(c.ss)+'</span></div>'+
@@ -295,12 +300,12 @@ if(el.dataset.price){
 }
 if(el.dataset.val){
  const key=el.dataset.val;
- if(key==="ptpDays"||key==="nuclearDays"){
+ if(key==="ptpDays"||key==="nuclearDays"||key==="turnDays"){
   // Permite escribir en cualquiera de los campos sin perder el foco del teclado.
   state.values.ptpDays=el.value;
   state.values.nuclearDays=el.value;
-  const twin=app.querySelector('input[data-val="'+(key==="ptpDays"?"nuclearDays":"ptpDays")+'"]');
-  if(twin)twin.value=el.value;
+  state.values.turnDays=el.value;
+  for(const other of ["ptpDays","nuclearDays","turnDays"]){const twin=app.querySelector('input[data-val="'+other+'"]');if(twin&&twin!==el)twin.value=el.value;}
  }else{
   state.values[key]=el.value;
  }
