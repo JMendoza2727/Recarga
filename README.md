@@ -57,3 +57,10 @@ El almacenamiento local de github.io y netlify.app es independiente.
 3. Abre la nueva aplicación de Netlify, ve a Configuración y pulsa **Importar copia**.
 4. Selecciona el archivo JSON, acepta la sustitución y verifica los importes antes de eliminar el acceso directo antiguo.
 Los registros se guardan únicamente en cada dispositivo; nunca se envían automáticamente al servidor.
+
+## Plus por días de parada
+En la calculadora hay dos campos adicionales de **días efectivamente trabajados**:
+- Plus parada laborable (lunes-viernes): **33,70 €/día**.
+- Plus parada sábado, domingo y festivo: **74,15 €/día**.
+
+Son las **tarifas publicadas para 2025 del convenio del metal de Tarragona**, utilizadas como referencia provisional para 2026 hasta que estén disponibles las nuevas tablas oficiales. Se incluyen en el dinero extra bruto y en la estimación de IRPF y cotizaciones. Un festivo que cae entre semana se introduce como festivo, no como día laborable. No se duplican las horas normales.
