@@ -1,5 +1,5 @@
 // Recargué: cache-first para usar la calculadora instalada incluso en modo avión.
-const CACHE="recargue-offline-v17";
+const CACHE="recargue-offline-v18";
 const CORE=["./","./index.html","./manifest.webmanifest","./convenio-acsa.html","./icons/recargue-192.png","./icons/recargue.svg"];
 const SCOPE=self.registration.scope;
 const localUrl=path=>new URL(path,SCOPE).href;
