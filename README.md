@@ -70,6 +70,7 @@ Son las **tarifas publicadas para 2025 del convenio del metal de Tarragona**, ut
 ## P.T.P. y complemento nuclear diario
 - **Días con P.T.P.:** 9,58 €/día, según nómina de referencia ACSA.
 - **Días con complemento nuclear:** 6,61 €/día, según nómina de referencia ACSA.
-- **Tick «No cobro complemento nuclear»:** desactiva el número de días nucleares y fija su valor calculado en cero sin eliminar lo que se hubiera escrito.
+- **Días vinculados:** al escribir el número de días en P.T.P. o en nuclear, se copia automáticamente al otro campo. Los dos representan los mismos días trabajados. También se sincronizan los datos recuperados de copias antiguas.
+- **Tick «No cobro complemento nuclear»:** mantiene los mismos días en ambos campos, pero fija únicamente el importe del complemento nuclear en cero. Ambos recuadros siguen permitiendo editar los días.
 - Ambos conceptos se consideran salario habitual y entran en **el valor total bruto y neto estimado**, con sus deducciones aproximadas.
 - Si la tarifa de hora normal configurada por cada trabajador ya engloba estos pluses, no conviene duplicarlos en el valor total.
