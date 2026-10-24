@@ -1,13 +1,14 @@
-// Recargué: cache-first para usar la calculadora instalada incluso en modo avión.
-const CACHE="recargue-offline-v19";
-const CORE=["./","./index.html","./manifest.webmanifest","./convenio-acsa.html","./icons/recargue-192.png","./icons/recargue.svg"];
+// Recargué: network-first para documentos; offline con última copia válida.
+const CACHE="recargue-offline-v20";
+const CORE=["./index.html","./manifest.webmanifest","./icons/recargue-192.png","./icons/recargue.svg"];
 const SCOPE=self.registration.scope;
 const localUrl=path=>new URL(path,SCOPE).href;
 const owned=name=>name.startsWith("recargue-")||name.startsWith("recarga-control-");
+const cacheable=response=>response&&response.ok&&response.status===200&&!response.redirected&&response.type!=="opaqueredirect";
 self.addEventListener("install",event=>{
  event.waitUntil((async()=>{
   const cache=await caches.open(CACHE);
-  await cache.addAll(CORE.map(path=>new Request(localUrl(path),{cache:"reload"})));
+  await cache.addAll(CORE.map(path=>new Request(localUrl(path),{cache:"reload",redirect:"error"})));
   await self.skipWaiting();
  })());
 });
@@ -23,29 +24,29 @@ self.addEventListener("fetch",event=>{
  if(request.method!=="GET")return;
  const url=new URL(request.url);
  if(url.origin!==self.location.origin||!url.href.startsWith(SCOPE))return;
- // Los visores PDF de iOS utilizan solicitudes Range; no interceptarlas.
+ // El visor de PDF de Safari debe hablar directamente con el servidor,
+ // incluidas las solicitudes parciales Range.
  if(url.pathname.toLowerCase().endsWith(".pdf")||request.headers.has("range"))return;
  event.respondWith((async()=>{
   const cache=await caches.open(CACHE);
-  const hit=await cache.match(request,{ignoreSearch:true});
-  if(hit){
-   if(request.mode==="navigate" && self.navigator?.onLine!==false)event.waitUntil(self.registration.update().catch(()=>{}));
-   return hit;
-  }
-  try{
-   const response=await fetch(request);
-   // El PDF grande no se descarga al instalar; si se abre completo se guarda.
-   // No guardar respuestas parciales 206 de los lectores PDF de iOS/Android.
-   if(response.ok&&response.status===200&&!request.headers.has("range")){
-    event.waitUntil(cache.put(request,response.clone()).catch(()=>{}));
-   }
-   return response;
-  }catch(err){
-   if(request.mode==="navigate"){
-    const fallback=await cache.match(localUrl("./index.html"));
-    if(fallback)return fallback;
+  const navigation=request.mode==="navigate";
+  const fallback=async()=>{
+   const cached=await cache.match(request,{ignoreSearch:true});
+   if(cached&&!cached.redirected)return cached;
+   if(navigation){
+    const home=await cache.match(localUrl("./index.html"));
+    if(home&&!home.redirected)return home;
    }
    return Response.error();
-  }
+  };
+  // Con conexión priorizar siempre el servidor, sin devolver HTML obsoleto.
+  try{
+   const response=await fetch(request,{cache:"no-store",redirect:"error"});
+   if(cacheable(response)){
+    event.waitUntil(cache.put(request,response.clone()).catch(()=>{}));
+    return response;
+   }
+   return await fallback();
+  }catch(err){return await fallback();}
  })());
 });
