@@ -164,7 +164,7 @@ function configScreen(){
 const p=state.prices,settings=state.configured;
 return (settings?header(true):'<div class="header"><div class="brand"><img class="appmark" src="./icons/recargue-192.png" alt=""><div><div class="brandname">Recargué</div><div class="subbrand">Configuración inicial</div></div></div></div>')+
 '<h1>'+(settings?'Modificar precios':'Configura tus precios')+'</h1><p class="lead">Indica el precio de tus horas. Las demás cantidades están fijadas en la aplicación.</p>'+
-'<div class="convenio-actions"><a class="convenio-link" href="https://www.ccoo.cat/industria/conveni-de-la-industria-siderometallurgica-de-tarragona/" target="_blank" rel="noopener noreferrer">▤ &nbsp;Ver convenio TGN</a><a class="convenio-link" href="./convenio-acsa.html" target="_blank" rel="noopener">▤ &nbsp;Ver convenio ACSA</a></div>'+
+'<div class="convenio-actions"><a class="convenio-link" href="https://www.ccoo.cat/industria/conveni-de-la-industria-siderometallurgica-de-tarragona/" target="_blank" rel="noopener noreferrer">▤ &nbsp;Ver convenio TGN</a><a class="convenio-link" href="./convenio-acsa-2025-2027.pdf" target="_blank" rel="noopener noreferrer">▤ &nbsp;Ver convenio ACSA</a></div>'+
 
 '<section class="panel"><div class="grid">'+field('Nombre (opcional)','name',p.name,'price',{full:true,text:true,placeholder:'Tu nombre'})+
 field('Hora normal (€/h)','normalRate',p.normalRate,'price',{required:true,placeholder:'Obligatorio'})+
@@ -186,7 +186,7 @@ function calculator(){
 const v=state.values,p=state.prices,c=cash();
 return header(false)+'<h1>'+(p.name?'Recarga de '+escapeHTML(p.name):'Calculadora de recarga')+'</h1>'+
 '<p class="lead">Introduce los totales de toda la recarga, aunque dure varios meses. No necesitas apuntar los datos día a día.</p>'+
-'<div class="convenio-actions"><a class="convenio-link" href="https://www.ccoo.cat/industria/conveni-de-la-industria-siderometallurgica-de-tarragona/" target="_blank" rel="noopener noreferrer">▤ &nbsp;Ver convenio TGN</a><a class="convenio-link" href="./convenio-acsa.html" target="_blank" rel="noopener">▤ &nbsp;Ver convenio ACSA</a></div>'+
+'<div class="convenio-actions"><a class="convenio-link" href="https://www.ccoo.cat/industria/conveni-de-la-industria-siderometallurgica-de-tarragona/" target="_blank" rel="noopener noreferrer">▤ &nbsp;Ver convenio TGN</a><a class="convenio-link" href="./convenio-acsa-2025-2027.pdf" target="_blank" rel="noopener noreferrer">▤ &nbsp;Ver convenio ACSA</a></div>'+
 
 '<section class="panel"><h2>Horas y desplazamientos</h2><div class="grid">'+
 field('Horas normales','normal',v.normal,'val')+field('Horas extras','extra',v.extra,'val')+
