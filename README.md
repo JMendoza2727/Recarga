@@ -64,3 +64,10 @@ En la calculadora hay dos campos adicionales de **días efectivamente trabajados
 - Plus parada sábado, domingo y festivo: **74,15 €/día**.
 
 Son las **tarifas publicadas para 2025 del convenio del metal de Tarragona**, utilizadas como referencia provisional para 2026 hasta que estén disponibles las nuevas tablas oficiales. Se incluyen en el dinero extra bruto y en la estimación de IRPF y cotizaciones. Un festivo que cae entre semana se introduce como festivo, no como día laborable. No se duplican las horas normales.
+
+## P.T.P. y complemento nuclear diario
+- **Días con P.T.P.:** 9,58 €/día, según nómina de referencia ACSA.
+- **Días con complemento nuclear:** 6,61 €/día, según nómina de referencia ACSA.
+- **Tick «No cobro complemento nuclear»:** desactiva el número de días nucleares y fija su valor calculado en cero sin eliminar lo que se hubiera escrito.
+- Ambos conceptos se consideran salario habitual: se incorporan al **valor total bruto** y al desglose, pero **no se vuelven a añadir al dinero extra bruto ni neto** para evitar doble contabilización.
+- Si la tarifa de hora normal configurada por cada trabajador ya engloba estos pluses, no conviene duplicarlos en el valor total.
